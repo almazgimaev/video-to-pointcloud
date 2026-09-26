@@ -8,10 +8,13 @@ from __future__ import annotations
 
 import platform
 import statistics
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 from v3d import metrics, package, probe, runid, runs, warnings_
 from v3d.artifacts import FrameRecord, Manifest, RunStatus, new_status, write_json
@@ -19,6 +22,7 @@ from v3d.config import DEFAULTS, preliminary_note
 from v3d.errors import NotEnoughFramesError
 from v3d.extract import extract_candidates
 from v3d.select.checks import check_enough_frames
+from v3d.select.quality import select_quality_nonredundant
 from v3d.select.uniform import select_uniform, selection_summary
 
 # The upstream command a human runs on the GPU machine. Our code is not moved there.
@@ -64,6 +68,19 @@ def _selection_params(
 def _collect_metrics(candidates) -> dict[int, float]:
     """Sharpness of every candidate. The metric is computed on a downscaled copy of the frame."""
     return {c.src_index: metrics.sharpness(metrics.load_gray(c.path)) for c in candidates}
+
+
+def _cached_difference(candidates) -> Callable[[int, int], float]:
+    """Frame difference by ``src_index`` with grayscale images loaded once each."""
+    by_index = {c.src_index: c for c in candidates}
+    cache: dict[int, np.ndarray] = {}
+
+    def gray(src: int) -> np.ndarray:
+        if src not in cache:
+            cache[src] = metrics.load_gray(by_index[src].path)
+        return cache[src]
+
+    return lambda a, b: metrics.frame_difference(gray(a), gray(b))
 
 
 def _fill_diffs(records: list[FrameRecord], candidates) -> list[float]:
@@ -142,10 +159,10 @@ def run_prepare(
     Order: file check → run directory → candidate extraction → metrics → selection →
     sufficiency check → package build → strict integrity check → manifest.
     """
-    if selector != "uniform":
-        raise NotImplementedError(
-            f"selection method '{selector}' is not implemented yet (task T046); use uniform"
-        )
+    if selector not in ("uniform", "quality"):
+        raise ValueError(f"unknown selection method '{selector}'; use uniform or quality")
+    if selector == "quality" and DEFAULTS.redundancy_diff_threshold is None:
+        raise NotImplementedError("tau for quality selection is not tuned yet (task T049)")
 
     started = datetime.now(UTC)
     durations: dict[str, float] = {}
@@ -180,14 +197,32 @@ def run_prepare(
             jpeg_quality=jpeg_quality,
         )
 
-    with runs.stage_timer(durations, "metrics"):
-        sharpness_by_index = _collect_metrics(candidates)
+    selection_info: dict = {}
+    if selector == "uniform":
+        # Uniform selection does not need sharpness; it is measured only to describe the
+        # frames, so its cost is not part of the selection cost.
+        with runs.stage_timer(durations, "metrics"):
+            sharpness_by_index = _collect_metrics(candidates)
+        with runs.stage_timer(durations, "select"):
+            records = select_uniform(
+                candidates, budget=budget, seed=seed, sharpness_by_index=sharpness_by_index
+            )
+            diffs = _fill_diffs(records, candidates)
+    else:
+        # Quality selection needs sharpness and frame differences to decide, so both are
+        # timed as part of "select": the selection cost must not look smaller than it is.
+        with runs.stage_timer(durations, "select"):
+            sharpness_by_index = _collect_metrics(candidates)
+            records, selection_info = select_quality_nonredundant(
+                candidates,
+                budget=budget,
+                tau=float(DEFAULTS.redundancy_diff_threshold),
+                sharpness_by_index=sharpness_by_index,
+                diff=_cached_difference(candidates),
+            )
+            diffs = [r.diff_to_prev_selected for r in records if r.diff_to_prev_selected]
 
-    with runs.stage_timer(durations, "select"):
-        records = select_uniform(
-            candidates, budget=budget, seed=seed, sharpness_by_index=sharpness_by_index
-        )
-        diffs = _fill_diffs(records, candidates)
+    with runs.stage_timer(durations, "check_frames"):
         try:
             check_enough_frames(records, min_frames=min_frames)
         except NotEnoughFramesError as err:
@@ -234,6 +269,7 @@ def run_prepare(
 
     selection = selection_summary(records, budget=budget, seed=seed) | {
         "params": params,
+        "quality": selection_info or None,
         "preliminary": [preliminary_note("frame_budget"), preliminary_note("min_frames")],
     }
 

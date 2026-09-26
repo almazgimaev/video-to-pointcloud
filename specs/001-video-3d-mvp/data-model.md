@@ -92,7 +92,7 @@ inputs_digest = sha256(
 | `sharpness` | float \| null | yes | variance of the Laplacian on a downscaled copy; `null` — the metric was not computed (zero is prohibited: it would mean a measured zero sharpness) |
 | `diff_to_prev_selected` | float \| null | yes/null | mean absolute 64×64 grayscale difference to the last selected one; `null` for the first |
 | `selected` | bool | yes | |
-| `reject_reason` | str \| null | yes/null | `blurry` \| `redundant` \| `budget_exhausted` \| `outside_window` \| null |
+| `reject_reason` | str \| null | yes/null | `blurry` \| `less_sharp_in_window` \| `redundant` \| `budget_exhausted` \| `outside_window` \| null |
 | `image_file` | str \| null | yes/null | file name in `package/images/`, if selected |
 
 Frame file name: `package/images/<frame_id>.jpg`. **The frame file name is the key linking to the camera**

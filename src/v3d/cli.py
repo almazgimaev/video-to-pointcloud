@@ -301,8 +301,63 @@ def cmd_media(args: argparse.Namespace) -> int:
 
 
 def cmd_compare(args: argparse.Namespace) -> int:
-    """Compare two runs of experiment P2 under pre-fixed conditions."""
-    raise NotImplementedError("the comparison stage is not implemented yet (task T051)")
+    """Compare two runs of experiment P2 under pre-fixed conditions, or create the conditions."""
+    from pathlib import Path
+
+    from v3d.compare import compare_runs, init_conditions
+    from v3d.errors import InputUnusableError
+
+    if getattr(args, "init", None):
+        missing = [
+            name
+            for name, value in (
+                ("--video", args.video),
+                ("--budget", args.budget),
+                ("--seed", args.seed),
+                ("--reconstructor", args.reconstructor),
+            )
+            if value is None
+        ]
+        if missing:
+            raise InputUnusableError("--init requires " + ", ".join(missing))
+        conditions = init_conditions(
+            Path(args.init),
+            video=Path(args.video),
+            budget=args.budget,
+            seed=args.seed,
+            reconstructor=args.reconstructor,
+            repeat=bool(args.repeat),
+        )
+        if getattr(args, "json", False):
+            print(json.dumps(conditions, ensure_ascii=False, indent=2))
+            return ExitCode.OK
+        say(args, f"conditions written: {Path(args.init) / 'conditions.json'}")
+        say(args, f"  exp_id: {conditions['exp_id']}")
+        say(args, f"  branches: {', '.join(conditions['branches'])}")
+        say(args, f"  repeat baseline required: {conditions['repeat_baseline']}")
+        return ExitCode.OK
+
+    if not args.conditions:
+        raise InputUnusableError("--conditions is required unless --init is given")
+    if not args.run_dir_a or not args.run_dir_b:
+        raise InputUnusableError("run_dir_a and run_dir_b are required unless --init is given")
+
+    repeat_arg = args.repeat if isinstance(args.repeat, str) else None
+    result = compare_runs(
+        Path(args.run_dir_a),
+        Path(args.run_dir_b),
+        Path(args.conditions),
+        repeat=Path(repeat_arg) if repeat_arg else None,
+    )
+    if getattr(args, "json", False):
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return ExitCode.OK
+
+    say(args, f"experiment: {result['exp_id']}")
+    say(args, f"  verdict: {result['verdict']}")
+    say(args, f"  results: {result['results_path']}")
+    say(args, f"  comparison: {result['comparison_path']}")
+    return ExitCode.OK
 
 
 # --- Argument parsing ----------------------------------------------------------------------
@@ -469,21 +524,51 @@ def build_parser() -> argparse.ArgumentParser:
     p_compare = subparsers.add_parser(
         "compare",
         parents=[common],
-        help="compare two runs of experiment P2",
+        help="compare two runs of experiment P2, or create its pre-run conditions with --init",
         description=(
-            "The comparison is rejected if the branches differ in anything other than the "
-            "frame selection method."
+            "Two uses: `--init EXP_DIR --video V --budget N --seed S --reconstructor TEXT` "
+            "writes EXP_DIR/conditions.json before any run; `run_dir_a run_dir_b --conditions "
+            "FILE` then compares an existing uniform run against a quality_nonredundant run "
+            "under those conditions. The comparison is rejected if the branches differ in "
+            "anything other than the frame selection method."
         ),
     )
-    p_compare.add_argument("run_dir_a", help="directory of the first run")
-    p_compare.add_argument("run_dir_b", help="directory of the second run")
     p_compare.add_argument(
-        "--conditions", required=True, help="file of pre-fixed conditions conditions.json"
+        "run_dir_a", nargs="?", default=None, help="uniform (baseline) run directory"
+    )
+    p_compare.add_argument(
+        "run_dir_b", nargs="?", default=None, help="quality_nonredundant (variant) run directory"
+    )
+    p_compare.add_argument(
+        "--conditions",
+        default=None,
+        help="conditions.json written by --init; required unless --init is given",
     )
     p_compare.add_argument(
         "--init",
-        action="store_true",
-        help="create the conditions file instead of comparing; changed conditions = new experiment",
+        default=None,
+        metavar="EXP_DIR",
+        help="create EXP_DIR/conditions.json instead of comparing; refuses if it already exists",
+    )
+    p_compare.add_argument("--video", default=None, help="video file (with --init)")
+    p_compare.add_argument(
+        "--budget", type=int, default=None, help="frame budget for both branches (with --init)"
+    )
+    p_compare.add_argument("--seed", type=int, default=None, help="selection seed (with --init)")
+    p_compare.add_argument(
+        "--reconstructor",
+        default=None,
+        help="free-text reconstructor description: model, weights, command (with --init)",
+    )
+    p_compare.add_argument(
+        "--repeat",
+        nargs="?",
+        const=True,
+        default=None,
+        help=(
+            "with --init: mark that a second uniform (baseline) run is required; "
+            "without --init: directory of that second uniform run"
+        ),
     )
     p_compare.set_defaults(func=cmd_compare)
 

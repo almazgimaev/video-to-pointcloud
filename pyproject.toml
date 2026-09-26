@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "v3d"
 version = "0.1.0"
 description = "Video-to-3D: colored point cloud and camera poses from an RGB video of a static object"
 requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
     "numpy>=1.26",
     "pillow>=10.0",

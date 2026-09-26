@@ -94,7 +94,7 @@ aligned output the tool works with (`normalized/`).
 
 ## Licences
 
-- Project code: see `LICENSE` (to be added).
+- Project code: [MIT](LICENSE). The licence covers this repository only, not the VGGT code or weights.
 - VGGT code: licence of the upstream repository. **`VGGT-1B` weights: CC-BY-NC-4.0** — non-commercial
   use only; this project is non-commercial.
 - COLMAP format tooling (`pycolmap`): BSD.

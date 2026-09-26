@@ -13,7 +13,7 @@ running on a GPU machine, brings the result back, stands the object upright, and
 export and measure it.
 
 - **Detailed report** — every step, measurement and failure: [`docs/report/report.md`](docs/report/report.md)
-- **Project page** — a visual walk-through with an interactive 3D view: [`site/`](site/)
+- **Project page** — a visual walk-through with an interactive 3D view: <https://almazgimaev.github.io/video-to-pointcloud/> (source in [`site/`](site/))
 
 ## Results
 

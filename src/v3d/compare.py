@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from v3d.artifacts import available, is_measure, read_json, unavailable, write_json
+from v3d.config import UPSTREAM_POINT_CAP
 from v3d.errors import ComparisonConditionsError, RunDirExistsError
 from v3d.runid import sha256_file
 from v3d.runs import RunLayout, find_run_dir
@@ -146,10 +147,16 @@ def init_conditions(
 # --- Reading a run's manifest fields -------------------------------------------------------
 
 
+# `v3d prepare --selector` takes short CLI names; branches in conditions.json use the canonical
+# strategy names recorded by the selectors themselves.
+SELECTOR_ALIASES = {"quality": "quality_nonredundant"}
+
+
 def _manifest_selector(manifest: dict) -> str | None:
     selection = manifest.get("selection") or {}
     params = selection.get("params") or {}
-    return params.get("selector") or selection.get("selector")
+    name = params.get("selector") or selection.get("selector")
+    return SELECTOR_ALIASES.get(name, name)
 
 
 def _code_id(manifest: dict) -> str | None:
@@ -203,6 +210,20 @@ def _selection_time(manifest: dict) -> tuple[float | None, float | None]:
     return None, None
 
 
+def _points_measure(value: int | None) -> dict:
+    """Point count; marked as a lower bound when it reaches the upstream cap."""
+    if value is None:
+        return unavailable("diagnostics.json has no points.num_points_valid")
+    measure = available(value)
+    if value >= UPSTREAM_POINT_CAP:
+        measure["saturated"] = True
+        measure["meaning"] = (
+            f"at the upstream cap of {UPSTREAM_POINT_CAP:,} points (max_points_for_colmap): "
+            "more points passed the confidence threshold; the true count is at least this"
+        )
+    return measure
+
+
 def _collect_metrics(layout: RunLayout) -> dict[str, dict]:
     """Every declared metric for one run, each as an available/unavailable measure (FR-036)."""
     _require_normalized(layout)
@@ -234,11 +255,7 @@ def _collect_metrics(layout: RunLayout) -> dict[str, dict]:
             if is_measure(registration_ratio)
             else unavailable("diagnostics.json has no cameras.registration_ratio")
         ),
-        "num_points_valid": (
-            available(num_points_valid)
-            if num_points_valid is not None
-            else unavailable("diagnostics.json has no points.num_points_valid")
-        ),
+        "num_points_valid": _points_measure(num_points_valid),
         "alignment_arc_coverage_deg": (
             available(arc_coverage, units="deg")
             if arc_coverage is not None
@@ -350,6 +367,19 @@ def _cell(measure: dict | None) -> str:
     return f"unavailable: {measure.get('reason', 'no reason recorded')}"
 
 
+def _saturation_lines(results: dict) -> list[str]:
+    saturated = results.get("saturated_branches") or []
+    if not saturated:
+        return []
+    return [
+        f"**Saturation**: the primary metric reached the upstream cap of {UPSTREAM_POINT_CAP:,} "
+        f"points in: {', '.join(saturated)}. The true count is higher, so the relative "
+        "difference is a lower bound; the verdict holds because the rule is satisfied even by "
+        "the lower bound.",
+        "",
+    ]
+
+
 def _render_comparison_md(results: dict) -> str:
     baseline_branch = results["branches"]["uniform"]
     variant_branch = results["branches"]["quality_nonredundant"]
@@ -401,6 +431,7 @@ def _render_comparison_md(results: dict) -> str:
         "",
         "## Limits of interpretation",
         "",
+        *_saturation_lines(results),
         results["interpretation_limits"],
         "",
     ]
@@ -492,7 +523,7 @@ def compare_runs(
 
     results = {
         "exp_id": conditions.get("exp_id"),
-        "conditions_path": str(conditions_path),
+        "conditions_path": "conditions.json",
         "generated_utc": datetime.now(UTC).isoformat(),
         "branches": {
             BRANCHES[0]: {
@@ -521,9 +552,20 @@ def compare_runs(
         },
         "decision_rule": conditions.get("decision_rule"),
         "verdict": verdict,
+        "saturated_branches": [
+            name
+            for name, metrics in (
+                ("baseline", metrics_a),
+                ("variant", metrics_b),
+                ("repeat", metrics_a2),
+            )
+            if metrics and metrics.get(PRIMARY_METRIC, {}).get("saturated")
+        ],
         "interpretation_limits": INTERPRETATION_LIMITS,
-        "results_path": str(results_path),
-        "comparison_path": str(comparison_path),
+        # Paths relative to the experiment directory: results.json is committed, and an
+        # absolute path would expose the author's file system.
+        "results_path": results_path.name,
+        "comparison_path": comparison_path.name,
     }
     write_json(results_path, results)
     comparison_path.write_text(_render_comparison_md(results), encoding="utf-8")

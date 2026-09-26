@@ -480,3 +480,24 @@ def test_comparison_md_contains_verdict_and_limits(tmp_path: Path) -> None:
     assert result["verdict"] == "regression"
     assert "regression" in text
     assert INTERPRETATION_LIMITS in text
+
+
+def test_cli_selector_name_quality_maps_to_the_canonical_branch() -> None:
+    """`v3d prepare --selector quality` must be accepted as the quality_nonredundant branch."""
+    from v3d.compare import _manifest_selector
+
+    assert _manifest_selector({"selection": {"params": {"selector": "quality"}}}) == (
+        "quality_nonredundant"
+    )
+    assert _manifest_selector({"selection": {"params": {"selector": "uniform"}}}) == "uniform"
+
+
+def test_point_count_at_the_upstream_cap_is_marked_as_a_lower_bound() -> None:
+    """A capped count is not the true count: it must be flagged, not read as exact."""
+    from v3d.compare import _points_measure
+    from v3d.config import UPSTREAM_POINT_CAP
+
+    capped = _points_measure(UPSTREAM_POINT_CAP)
+    assert capped["saturated"] is True
+    assert "at least" in capped["meaning"]
+    assert "saturated" not in _points_measure(UPSTREAM_POINT_CAP - 1)

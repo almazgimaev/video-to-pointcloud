@@ -59,6 +59,11 @@ class Defaults:
 
 DEFAULTS = Defaults()
 
+# Upstream fact, not a tunable: VGGT demo_colmap.py keeps at most this many points
+# (`max_points_for_colmap`). A run that reaches it has more points passing the confidence
+# threshold than it reports, so the count is a lower bound.
+UPSTREAM_POINT_CAP = 100_000
+
 
 def is_preliminary(name: str) -> bool:
     """True if the parameter value is not yet justified by measurement."""

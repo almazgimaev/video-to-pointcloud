@@ -1,0 +1,160 @@
+{
+  "exp_id": "p2_pumpkin_48",
+  "conditions_path": "conditions.json",
+  "generated_utc": "2026-09-26T22:47:21.342866+00:00",
+  "branches": {
+    "uniform": {
+      "run_id": "20260926-221214-e80ab63c",
+      "run_dir": "runs/20260926-221214-e80ab63c",
+      "metrics": {
+        "cameras_registered": {
+          "value": 48,
+          "availability": "available"
+        },
+        "registration_ratio": {
+          "value": 1.0,
+          "availability": "available",
+          "meaning": "Share of selected frames that received a camera pose: cameras_registered / frames_selected. Shows the coverage of the selected set, but not the quality of poses."
+        },
+        "num_points_valid": {
+          "value": 9346,
+          "availability": "available"
+        },
+        "alignment_arc_coverage_deg": {
+          "value": 334.4565796892447,
+          "availability": "available",
+          "units": "deg"
+        },
+        "alignment_planarity": {
+          "value": 0.05463909302411332,
+          "availability": "available"
+        },
+        "selection_time_s": {
+          "value": 0.159,
+          "availability": "available",
+          "units": "s"
+        },
+        "selection_time_share": {
+          "value": 0.020795187025895893,
+          "availability": "available"
+        },
+        "visual_check_defects": {
+          "value": 2,
+          "availability": "available"
+        }
+      }
+    },
+    "quality_nonredundant": {
+      "run_id": "20260926-221232-494c1365",
+      "run_dir": "runs/20260926-221232-494c1365",
+      "metrics": {
+        "cameras_registered": {
+          "value": 48,
+          "availability": "available"
+        },
+        "registration_ratio": {
+          "value": 1.0,
+          "availability": "available",
+          "meaning": "Share of selected frames that received a camera pose: cameras_registered / frames_selected. Shows the coverage of the selected set, but not the quality of poses."
+        },
+        "num_points_valid": {
+          "value": 100000,
+          "availability": "available",
+          "saturated": true,
+          "meaning": "at the upstream cap of 100,000 points (max_points_for_colmap): more points passed the confidence threshold; the true count is at least this"
+        },
+        "alignment_arc_coverage_deg": {
+          "value": 327.6745083213554,
+          "availability": "available",
+          "units": "deg"
+        },
+        "alignment_planarity": {
+          "value": 0.05044772117008278,
+          "availability": "available"
+        },
+        "selection_time_s": {
+          "value": 1.191,
+          "availability": "available",
+          "units": "s"
+        },
+        "selection_time_share": {
+          "value": 0.15666929755327547,
+          "availability": "available"
+        },
+        "visual_check_defects": {
+          "value": 1,
+          "availability": "available"
+        }
+      }
+    }
+  },
+  "repeat": {
+    "run_id": "20260926-221223-e80ab63c",
+    "run_dir": "runs/20260926-221223-e80ab63c",
+    "metrics": {
+      "cameras_registered": {
+        "value": 48,
+        "availability": "available"
+      },
+      "registration_ratio": {
+        "value": 1.0,
+        "availability": "available",
+        "meaning": "Share of selected frames that received a camera pose: cameras_registered / frames_selected. Shows the coverage of the selected set, but not the quality of poses."
+      },
+      "num_points_valid": {
+        "value": 9297,
+        "availability": "available"
+      },
+      "alignment_arc_coverage_deg": {
+        "value": 334.4565796892447,
+        "availability": "available",
+        "units": "deg"
+      },
+      "alignment_planarity": {
+        "value": 0.05463909302411332,
+        "availability": "available"
+      },
+      "selection_time_s": {
+        "value": 0.159,
+        "availability": "available",
+        "units": "s"
+      },
+      "selection_time_share": {
+        "value": 0.020800627943485087,
+        "availability": "available"
+      },
+      "visual_check_defects": {
+        "value": 2,
+        "availability": "available"
+      }
+    }
+  },
+  "relative_difference_primary": {
+    "variant_vs_baseline": {
+      "value": 9.699764605178686,
+      "availability": "available"
+    },
+    "baseline_vs_repeat": {
+      "value": -0.005242884656537556,
+      "availability": "available"
+    }
+  },
+  "decision_rule": {
+    "primary_metric": "num_points_valid",
+    "parameters": {
+      "improvement_ratio": 1.1,
+      "regression_ratio": 0.9
+    },
+    "improvement": "variant.num_points_valid >= baseline.num_points_valid * improvement_ratio AND variant.registration_ratio >= baseline.registration_ratio AND variant.visual_check_defects <= baseline.visual_check_defects",
+    "regression": "variant.num_points_valid <= baseline.num_points_valid * regression_ratio OR variant.registration_ratio < baseline.registration_ratio OR variant.visual_check_defects > baseline.visual_check_defects",
+    "no_difference": "neither the improvement nor the regression condition holds",
+    "inconclusive": "repeat_baseline is true and the relative difference between the two baseline runs in the primary metric is >= the relative difference between variant and baseline: the effect is not larger than run-to-run variation"
+  },
+  "verdict": "improvement",
+  "saturated_branches": [
+    "variant"
+  ],
+  "interpretation_limits": "One video, one run per branch; point count at a fixed confidence threshold is a proxy for depth confidence, not proof of geometric accuracy.",
+  "results_path": "results.json",
+  "comparison_path": "comparison.md"
+}

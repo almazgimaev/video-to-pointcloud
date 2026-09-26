@@ -282,3 +282,21 @@ def test_camera_without_intrinsics_does_not_crash_the_viewer(tmp_path: Path) -> 
     assert file.stat().st_size > 0
     assert summary["cameras"] == 2
     assert summary["cameras_with_intrinsics"] == 1
+
+
+def test_up_axis_is_logged_at_the_3d_view_origin(tmp_path: Path) -> None:
+    """Rerun reads the up axis at the view's origin; logging it elsewhere leaves the view tilted."""
+    from v3d.artifacts import read_json, write_json
+    from v3d.viewer import WORLD_PATH, build_recording
+
+    run_dir = _build_run(tmp_path)
+    cameras_path = run_dir / "normalized" / "cameras.json"
+    cameras = read_json(cameras_path)
+    cameras["world_alignment"] = {"status": "estimated", "quality": {}, "note": "estimated"}
+    write_json(cameras_path, cameras)
+
+    summary = build_recording(run_dir, save_to=tmp_path / "s.rrd", spawn=False)
+    coords = summary["view_coordinates"]
+    assert coords["up"] == "+Y"
+    assert coords["path"] == WORLD_PATH
+    assert coords["view_origin"] == f"/{WORLD_PATH}", "coordinates must sit on the view origin"

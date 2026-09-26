@@ -56,6 +56,7 @@ from v3d.status import status_banner
 APPLICATION_ID = "v3d"
 
 #: Entity paths. Cameras are placed in a separate branch so that the layer toggles as a whole.
+WORLD_PATH = "world"
 POINTS_PATH = "world/points"
 POINTS_UNUSABLE_PATH = "world/points_unusable"
 CAMERAS_PATH = "world/cameras"
@@ -178,6 +179,11 @@ def build_recording(
             "warnings": WARNINGS_PATH,
             "metrics": METRICS_PATH,
         },
+        "view_coordinates": {
+            "path": WORLD_PATH,
+            "view_origin": f"/{WORLD_PATH}",
+            "up": "+Y" if _is_aligned(cameras_file) else "-Y (reconstructor frame, OpenCV-style)",
+        },
         "saved_to": str(save_to) if save_to is not None else None,
         "spawned": spawn,
     }
@@ -206,7 +212,10 @@ def _log_all(
     # is right-handed with +Y up; otherwise the reconstructor frame keeps the OpenCV-style
     # +Y down. Camera axes stay OpenCV inside each camera (logged per camera as RDF).
     world = rr.ViewCoordinates.RIGHT_HAND_Y_UP if y_up else rr.ViewCoordinates.RIGHT_HAND_Y_DOWN
-    stream.log("/", world, static=True)
+    # The 3D view's origin is WORLD_PATH, and Rerun reads the up axis from the view's origin
+    # entity. Logging the coordinates only at "/" left the view on its default axis, so an
+    # aligned result looked tilted in the viewer while the data were upright.
+    stream.log(WORLD_PATH, world, static=True)
 
     stream.log(
         cloud_path,
@@ -302,7 +311,7 @@ def _blueprint(cloud_path: str) -> rrb.Blueprint:
     """
     return rrb.Blueprint(
         rrb.Horizontal(
-            rrb.Spatial3DView(origin="/world", name="cloud and cameras"),
+            rrb.Spatial3DView(origin=f"/{WORLD_PATH}", name="cloud and cameras"),
             rrb.Vertical(
                 rrb.TextDocumentView(origin=STATUS_PATH, name="status"),
                 rrb.TextDocumentView(origin=METRICS_PATH, name="measures"),

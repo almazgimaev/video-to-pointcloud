@@ -155,7 +155,7 @@ run and that the 3D view loads only on demand.
 4. **Given** stored run artifacts, **When** the media command is run, **Then** renders, a
    turntable animation, and a video-frame-versus-render pair are produced, each captioned with
    the `run_id` and its source.
-5. **Given** the built site, **When** it is opened as local files without a server, **Then** the
+5. **Given** the built site served by a static file server, **When** it is opened, **Then** the
    landing page shows the visuals, the report opens on click, and the interactive 3D view loads
    only when requested and states how many of the points it shows.
 6. **Given** the repository, **When** the hygiene check runs, **Then** it finds only English
@@ -370,9 +370,10 @@ observation and its possible consequences, and does not establish the cause.
   shown out of the total, and MUST be derived deterministically from the normalized result.
 - **FR-053**: The project MUST provide a reader-facing README with visuals and links to the
   detailed project report and to the project page.
-- **FR-054**: The project page MUST build into static files that open without a server: a light
+- **FR-054**: The project page MUST build into static files served without any backend: a light
   landing page with visuals, a detailed report opened on click, and an interactive 3D view loaded
-  only on demand. It MUST NOT include analytics or third-party tracking.
+  only on demand. It MUST NOT include analytics, third-party tracking or requests to third-party
+  hosts (fonts and libraries are bundled).
 - **FR-055**: Repository and published materials MUST be in English and MUST NOT contain details
   of the author's infrastructure (host names, user names, absolute home paths, how the GPU
   machine is accessed or shared). This MUST be checked automatically.
@@ -517,8 +518,11 @@ end-to-end run.
 - **SC-017**: After alignment the export still contains exactly the shown cloud (FR-031).
 - **SC-018**: A visual check item written by the command is visible in `diagnostics.json` and
   in the report.
-- **SC-019**: The built project page opens from local files without a server; the 3D view is
-  not downloaded until requested.
+- **SC-019**: The built project page is plain static files served by any static file server
+  (for example `python -m http.server`) or GitHub Pages, with no backend; the 3D view is not
+  downloaded until requested. (Amended 2026-09-27: opening directly from `file://` is not
+  possible for any page using JavaScript modules or fetching the point cloud, because browsers
+  block both for local files; the intent — no server-side logic — is unchanged.)
 - **SC-020**: The repository hygiene check reports zero lines outside the Latin and Greek
   scripts and zero infrastructure details.
 

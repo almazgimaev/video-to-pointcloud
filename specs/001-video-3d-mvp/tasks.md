@@ -226,7 +226,7 @@ every push.
 - [ ] T085 [US3] Landing page: input video frames next to renders, turntable, key numbers, links; detailed report page rendered from `docs/report/`
 - [ ] T086 [US3] Interactive 3D island (three.js `PLYLoader` + `OrbitControls`) loading the decimated PLY only on click, with the "N of M points" label (SC-019)
 - [X] T087 [US3] Reader-facing `README.md`: what, how, results with visuals, honest limitations, links to the report and the page (supersedes T058)
-- [ ] T088 [US3] Verify: `npm run build`, open `site/dist/index.html` from disk, 3D not downloaded until requested, hygiene test green
+- [ ] T088 [US3] Verify: `npm run build`, serve `site/dist/` with a static file server, 3D not downloaded until requested, no third-party requests, hygiene test green
 
 **Checkpoint**: the project is presentable; publication happens only on explicit request.
 

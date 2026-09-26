@@ -1,0 +1,328 @@
+@import 'tailwindcss';
+@import './fonts.css';
+@plugin '@tailwindcss/typography';
+@source not '../assets';
+
+/* The theme is set on <html data-theme="dark|light">; dark is the default. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-warm: var(--warm);
+}
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #fcfcfb;
+  --surface: #f4f3ef;
+  --surface-2: #ebeae4;
+  --line: #e1e0d9;
+  --fg: #0b0b0b;
+  --muted: #52514e;
+  --faint: #6b6a66;
+  --accent: #1f6bc4;
+  --accent-fg: #ffffff;
+  --warm: #b8481b;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f0f0e;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --line: #2c2c2a;
+  --fg: #f5f5f3;
+  --muted: #c3c2b7;
+  --faint: #9d9c93;
+  --accent: #5a9ff0;
+  --accent-fg: #0b0b0b;
+  --warm: #ec7a4a;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.7rem 1.2rem;
+    font-weight: 550;
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  .btn-primary:hover {
+    background: color-mix(in oklab, var(--accent) 85%, var(--fg));
+  }
+  .btn-ghost {
+    border: 1px solid var(--line);
+    color: var(--fg);
+  }
+  .btn-ghost:hover {
+    background: var(--surface);
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+  }
+  .caption {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  code.cmd {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 0.375rem;
+    padding: 0.1em 0.4em;
+    white-space: nowrap;
+  }
+}
+
+/* ---- Charts: force the palette of the page theme over the charts' own OS-based dark block. ---- */
+:root[data-theme='light'] svg.viz .bg { fill: #fcfcfb; }
+:root[data-theme='light'] svg.viz .title,
+:root[data-theme='light'] svg.viz .label { fill: #0b0b0b; }
+:root[data-theme='light'] svg.viz .sub,
+:root[data-theme='light'] svg.viz .label-2 { fill: #52514e; }
+:root[data-theme='light'] svg.viz .grid { stroke: #e1e0d9; }
+:root[data-theme='light'] svg.viz .axis { stroke: #c3c2b7; }
+:root[data-theme='light'] svg.viz .s1 { fill: #2a78d6; }
+:root[data-theme='light'] svg.viz .s2 { fill: #eb6834; }
+:root[data-theme='light'] svg.viz .line-s1,
+:root[data-theme='light'] svg.viz .line-est { stroke: #2a78d6; }
+:root[data-theme='light'] svg.viz .dot-est { fill: #fcfcfb; stroke: #2a78d6; }
+
+:root[data-theme='dark'] svg.viz .bg { fill: #1a1a19; }
+:root[data-theme='dark'] svg.viz .title,
+:root[data-theme='dark'] svg.viz .label { fill: #ffffff; }
+:root[data-theme='dark'] svg.viz .sub,
+:root[data-theme='dark'] svg.viz .label-2 { fill: #c3c2b7; }
+:root[data-theme='dark'] svg.viz .grid { stroke: #2c2c2a; }
+:root[data-theme='dark'] svg.viz .axis { stroke: #383835; }
+:root[data-theme='dark'] svg.viz .s1 { fill: #3987e5; }
+:root[data-theme='dark'] svg.viz .s2 { fill: #d95926; }
+:root[data-theme='dark'] svg.viz .line-s1,
+:root[data-theme='dark'] svg.viz .line-est { stroke: #3987e5; }
+:root[data-theme='dark'] svg.viz .dot-est { fill: #1a1a19; stroke: #3987e5; }
+
+svg.viz {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* ---- Long-form report ---- */
+.report {
+  --tw-prose-body: var(--muted);
+  --tw-prose-headings: var(--fg);
+  --tw-prose-lead: var(--muted);
+  --tw-prose-links: var(--fg);
+  --tw-prose-bold: var(--fg);
+  --tw-prose-counters: var(--faint);
+  --tw-prose-bullets: var(--faint);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--fg);
+  --tw-prose-quote-borders: var(--line);
+  --tw-prose-captions: var(--faint);
+  --tw-prose-code: var(--fg);
+  --tw-prose-pre-code: var(--fg);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--line);
+  --tw-prose-td-borders: var(--line);
+  color: var(--muted);
+}
+.report :where(p, li) {
+  color: color-mix(in oklab, var(--fg) 82%, var(--bg));
+}
+.report h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.1;
+}
+.report h2 {
+  letter-spacing: -0.015em;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.report h2,
+.report h3 {
+  position: relative;
+  scroll-margin-top: 5rem;
+}
+.report .anchor {
+  position: absolute;
+  left: -1.1em;
+  color: var(--faint);
+  text-decoration: none;
+  opacity: 0;
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+.report h2:hover .anchor,
+.report h3:hover .anchor {
+  opacity: 1;
+}
+.report a {
+  text-decoration-color: color-mix(in oklab, var(--accent) 60%, transparent);
+  text-underline-offset: 3px;
+}
+.report a:hover {
+  color: var(--accent);
+}
+.report :not(pre) > code {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.1em 0.35em;
+  font-weight: 450;
+  font-size: 0.86em;
+  overflow-wrap: anywhere;
+}
+.report :not(pre) > code::before,
+.report :not(pre) > code::after {
+  content: none;
+}
+.report pre {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.report figure {
+  margin-block: 2rem;
+}
+.report figure img {
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  margin: 0;
+  width: 100%;
+  height: auto;
+  background: var(--surface);
+}
+.report figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--faint);
+}
+.report .figure-chart svg {
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+}
+.report .table-wrap {
+  overflow-x: auto;
+  margin-block: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+}
+.report .table-wrap table {
+  margin: 0;
+  font-size: 0.875rem;
+  min-width: 100%;
+}
+.report thead {
+  background: var(--surface);
+}
+.report thead th {
+  color: var(--fg);
+  font-weight: 600;
+  padding: 0.6rem 0.8rem;
+}
+.report tbody td {
+  padding: 0.55rem 0.8rem;
+  vertical-align: top;
+}
+.report thead th:first-child,
+.report tbody td:first-child {
+  padding-left: 0.9rem;
+}
+.report tbody td img {
+  margin: 0;
+  border-radius: 0.5rem;
+  min-width: 6rem;
+  width: 100%;
+  height: auto;
+}
+/* A table with an empty header row (the report's "At a glance") reads as a key/value list. */
+.report thead:has(th:empty:first-child + th:empty:last-child) {
+  display: none;
+}
+.report tbody td:first-child:has(+ td:last-child) {
+  color: var(--fg);
+  font-weight: 550;
+  white-space: nowrap;
+}
+.report hr {
+  display: none;
+}

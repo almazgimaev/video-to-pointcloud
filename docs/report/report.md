@@ -103,7 +103,7 @@ refused, the reason written down. An empty reconstruction was not presented as a
 
 ### 2.4 Result
 
-48 of 48 cameras registered, a full 374° orbit, the object clearly recognizable. The render from a
+48 of 48 cameras registered, the orbit covered 334° of the circle, the object clearly recognizable. The render from a
 reconstructed camera pose lines up with the real video frame:
 
 ![A later video frame next to a render from the same pose](../assets/pair_0032_000432.webp)

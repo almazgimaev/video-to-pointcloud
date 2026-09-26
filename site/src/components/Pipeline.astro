@@ -1,0 +1,69 @@
+---
+// The pipeline: a light stage on a laptop, a heavy stage on a separate GPU machine, and back.
+const stages = [
+  {
+    where: 'Laptop',
+    tone: 'accent',
+    steps: [
+      { cmd: 'v3d check video.mp4', what: 'Check the video: format, codec, orientation.' },
+      { cmd: 'v3d prepare video.mp4', what: 'Select 48 frames and build the transfer package with SHA256SUMS.' },
+    ],
+  },
+  {
+    where: 'GPU machine · NVIDIA RTX 5090',
+    tone: 'warm',
+    steps: [{ cmd: 'demo_colmap.py', what: 'Upstream VGGT script, run as is: frames in, COLMAP sparse model out. No project code runs here.' }],
+  },
+  {
+    where: 'Laptop',
+    tone: 'accent',
+    steps: [
+      { cmd: 'v3d ingest runs/<run_id>', what: 'Validate the result, align the world, write diagnostics and a status.' },
+      { cmd: 'v3d view runs/<run_id>', what: 'Inspect cameras and points in an interactive viewer.' },
+      { cmd: 'v3d export · report · media', what: 'PLY export, the run report, renders and animations.' },
+    ],
+  },
+];
+let n = 0;
+---
+<ol class="pipeline grid gap-4 lg:grid-cols-[1fr_auto_0.8fr_auto_1.2fr] lg:items-stretch" aria-label="Pipeline, in order">
+  {stages.map((stage, i) => (
+    <>
+      {i > 0 && (
+        <li class="flex items-center justify-center text-faint" aria-hidden="true">
+          <svg class="h-6 w-6 rotate-90 lg:rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12h15M13 6l6 6-6 6"></path>
+          </svg>
+          <span class="sr-only">then</span>
+        </li>
+      )}
+      <li class:list={['card flex flex-col gap-4 p-5', stage.tone === 'warm' && 'stage-warm']}>
+        <p class:list={['eyebrow flex items-center gap-2', stage.tone === 'warm' ? '!text-warm' : '!text-accent']}>
+          <span class="inline-block size-1.5 rounded-full bg-current" aria-hidden="true"></span>
+          {stage.where}
+        </p>
+        <ol class="flex flex-col gap-4">
+          {stage.steps.map((s) => {
+            n += 1;
+            return (
+              <li class="flex gap-3">
+                <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-2 font-mono text-xs text-muted">{n}</span>
+                <div class="min-w-0 space-y-1">
+                  <code class="cmd inline-block max-w-full overflow-hidden text-ellipsis !whitespace-normal break-words text-fg">{s.cmd}</code>
+                  <p class="text-sm leading-relaxed text-muted">{s.what}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </li>
+    </>
+  ))}
+</ol>
+
+<style>
+  .stage-warm {
+    border-color: color-mix(in oklab, var(--warm) 35%, var(--line));
+    background: color-mix(in oklab, var(--warm) 6%, var(--surface));
+  }
+</style>

@@ -222,11 +222,11 @@ every push.
 
 - [X] T082 [US3] Write the detailed project report in `docs/report/` (M1 → alignment → P2 → decisions → measurements → failures), linking stored artifacts
 - [X] T083 [US3] SVG charts for the report and the page (memory versus frames, confidence threshold versus points, P2 comparison) with a consistent palette
-- [ ] T084 [US3] Scaffold `site/` with Astro + Tailwind; static output to `site/dist/` (gitignored); no analytics
-- [ ] T085 [US3] Landing page: input video frames next to renders, turntable, key numbers, links; detailed report page rendered from `docs/report/`
-- [ ] T086 [US3] Interactive 3D island (three.js `PLYLoader` + `OrbitControls`) loading the decimated PLY only on click, with the "N of M points" label (SC-019)
+- [X] T084 [US3] Scaffold `site/` with Astro + Tailwind; static output to `site/dist/` (gitignored); no analytics
+- [X] T085 [US3] Landing page: input video frames next to renders, turntable, key numbers, links; detailed report page rendered from `docs/report/`
+- [X] T086 [US3] Interactive 3D island (three.js `PLYLoader` + `OrbitControls`) loading the decimated PLY only on click, with the "N of M points" label (SC-019)
 - [X] T087 [US3] Reader-facing `README.md`: what, how, results with visuals, honest limitations, links to the report and the page (supersedes T058)
-- [ ] T088 [US3] Verify: `npm run build`, serve `site/dist/` with a static file server, 3D not downloaded until requested, no third-party requests, hygiene test green
+- [X] T088 [US3] Verify: `npm run build`, serve `site/dist/` with a static file server, 3D not downloaded until requested, no third-party requests, hygiene test green
 
 **Checkpoint**: the project is presentable; publication happens only on explicit request.
 

@@ -1,0 +1,25 @@
+---
+import { CC_BY_NC_URL, href, REPO_URL, VGGT_URL, VGGT_WEIGHTS_URL } from '../lib/site';
+---
+<footer class="mt-24 border-t border-line">
+  <div class="container-page grid gap-8 py-12 text-sm text-muted sm:grid-cols-[1.4fr_1fr]">
+    <div class="space-y-3">
+      <p class="font-semibold text-fg">Video-to-3D</p>
+      <p class="max-w-prose leading-relaxed">
+        A learning and portfolio project in 3D perception. Reconstruction by
+        <a class="underline decoration-line underline-offset-4 hover:text-fg" href={VGGT_URL} rel="noopener">VGGT</a>;
+        everything around the model is built here.
+      </p>
+      <p class="max-w-prose leading-relaxed text-faint">
+        The <a class="underline decoration-line underline-offset-4 hover:text-fg" href={VGGT_WEIGHTS_URL} rel="noopener">VGGT-1B</a> weights are
+        licensed <a class="underline decoration-line underline-offset-4 hover:text-fg" href={CC_BY_NC_URL} rel="noopener">CC-BY-NC-4.0</a>
+        (non-commercial use only); this project is non-commercial. VGGT code: licence of the upstream repository.
+      </p>
+    </div>
+    <ul class="space-y-2 sm:justify-self-end">
+      <li><a class="hover:text-fg" href={href('report/')}>Detailed report</a></li>
+      <li><a class="hover:text-fg" href={REPO_URL} rel="noopener">Repository on GitHub</a></li>
+      <li><a class="hover:text-fg" href={VGGT_URL} rel="noopener">VGGT project</a></li>
+    </ul>
+  </div>
+</footer>

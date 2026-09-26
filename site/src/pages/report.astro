@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { renderReport } from '../lib/report';
+import { REPO_URL } from '../lib/site';
+
+const { html, headings, title } = renderReport();
+const toc = headings.filter((h) => h.depth === 2 && !/^contents$/i.test(h.text));
+---
+<Base title={title} description="The detailed report of Video-to-3D: what was built, measured and found, and what the numbers do and do not mean." current="report">
+  <div class="container-page grid gap-10 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
+    <article class="report prose prose-neutral max-w-[46rem] min-w-0 sm:prose-lg prose-headings:scroll-mt-20 prose-img:my-0" set:html={html} />
+    <aside class="hidden lg:block" aria-label="On this page">
+      <nav class="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pb-6 text-sm">
+        <p class="eyebrow mb-3">On this page</p>
+        <ol class="space-y-1 border-l border-line">
+          {toc.map((h) => (
+            <li>
+              <a href={`#${h.slug}`} data-toc-link class="-ml-px block border-l border-transparent py-1 pl-3 text-muted transition-colors hover:border-faint hover:text-fg">{h.text}</a>
+            </li>
+          ))}
+        </ol>
+        <p class="mt-6 pl-3 text-xs text-faint">Source: <a class="underline underline-offset-2 hover:text-fg" href={`${REPO_URL}/blob/main/docs/report/report.md`} rel="noopener">docs/report/report.md</a></p>
+      </nav>
+    </aside>
+  </div>
+</Base>

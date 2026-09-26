@@ -1,0 +1,202 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import Img from '../components/Img.astro';
+import Pipeline from '../components/Pipeline.astro';
+import PointCloudDialog from '../components/PointCloudDialog.astro';
+import { assetUrl, altOf } from '../lib/assets';
+import { chartSvg } from '../lib/charts';
+import { href, SITE_PITCH, SITE_TITLE } from '../lib/site';
+
+const stats = [
+  { value: '48 / 48', label: 'camera poses registered', note: 'every selected frame got a pose' },
+  { value: '334°', label: 'orbit coverage', note: 'a full orbit; the gap is where the capture did not go' },
+  { value: 'Upright', label: 'vertical estimated from cameras', note: 'recorded as an estimate, not a measurement' },
+  { value: 'Improvement', label: 'P2 frame-selection verdict', note: '≥ 100,000 vs 9,346 points at a stress-test threshold' },
+];
+
+const limits = [
+  { title: 'Scale is not determined', text: 'There is no independent reference, so no metric accuracy or surface completeness is claimed.' },
+  { title: 'A point cloud, not a mesh', text: 'The output is coloured points with camera poses. Residual background is kept and marked.' },
+  { title: 'The vertical is estimated', text: 'It comes from the ring of camera positions, not from a gravity sensor or a measurement.' },
+  { title: 'One real capture', text: 'Everything was measured on one video of one object. Nothing is generalized from it.' },
+];
+---
+<Base title={`${SITE_TITLE} — from a phone video to a 3D point cloud`} description={SITE_PITCH} current="home">
+  <!-- 1. Hero -->
+  <section class="container-page grid items-center gap-10 pt-12 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pt-20" aria-labelledby="hero-title">
+    <div class="space-y-6">
+      <p class="eyebrow">3D perception · portfolio project</p>
+      <h1 id="hero-title" class="text-4xl font-bold leading-[1.05] tracking-tight text-fg text-balance sm:text-5xl lg:text-6xl">
+        From a phone video to a coloured 3D point cloud
+      </h1>
+      <p class="max-w-xl text-lg leading-relaxed text-muted text-pretty">
+        Record a short orbit around a static object. The tool selects frames, hands them to a reconstruction model on a
+        separate GPU machine, brings the point cloud and camera poses back, stands the object upright and tells you
+        honestly what the result does and does not show.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-open-viewer>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2 3 7v10l9 5 9-5V7l-9-5z"></path><path d="M3 7l9 5 9-5M12 12v10"></path>
+          </svg>
+          Explore in 3D
+        </button>
+        <a class="btn btn-ghost" href={href('report/')}>Read the report</a>
+      </div>
+      <p class="text-xs text-faint">The 3D view loads three.js and a 0.6 MB point cloud only when you open it.</p>
+    </div>
+    <figure class="space-y-3">
+      <div class="overflow-hidden rounded-2xl border border-line bg-[#0b0b0a]">
+        <video
+          class="block aspect-square h-auto w-full object-cover"
+          src={assetUrl('turntable.mp4')}
+          poster={assetUrl('view_front.webp')}
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          data-autoplay
+          aria-label="Turntable animation of the reconstructed point cloud"
+        ></video>
+      </div>
+      <figcaption class="caption">
+        Turntable animation of the reconstructed point cloud of a patty-pan gourd (72 frames).
+        Rendered from the stored run artifacts on the CPU.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- 2. Frame vs reconstruction -->
+  <Section
+    id="check"
+    eyebrow="End-to-end check"
+    title="Video frame vs reconstruction"
+    lead="On the left, a frame of the input video. On the right, the point cloud rendered from the camera pose the model estimated for that frame. Had any transform between the reconstructor, the ingest and the renderer been wrong, the object would be shifted, mirrored or upside down."
+  >
+    <div class="grid gap-6">
+      <figure class="space-y-3">
+        <Img file="pair_0000_000000.webp" />
+        <figcaption class="caption">First video frame (left) next to a render from the same estimated camera pose (right).</figcaption>
+      </figure>
+      <figure class="space-y-3">
+        <Img file="pair_0032_000432.webp" />
+        <figcaption class="caption">A later video frame, 432 frames into the video, next to a render from its estimated camera pose.</figcaption>
+      </figure>
+    </div>
+  </Section>
+
+  <!-- 3. Key numbers -->
+  <Section id="numbers" eyebrow="Main run" title="Key numbers" lead="One 26.5 s phone video, 1920×1080, 48 frames with the default settings — the only run with those settings, not the best of several.">
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {stats.map((s) => (
+        <li class="card flex flex-col gap-1 p-5">
+          <span class="text-3xl font-semibold tracking-tight text-fg tabular-nums">{s.value}</span>
+          <span class="text-sm font-medium text-fg">{s.label}</span>
+          <span class="mt-1 text-sm leading-relaxed text-muted">{s.note}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <!-- 4. How it works -->
+  <Section
+    id="how"
+    eyebrow="How it works"
+    title="A light stage on a laptop, a heavy stage on a GPU"
+    lead="The two sides exchange files only, with checksums. Reconstruction is VGGT (VGGT-1B), run with its own script; everything around the model is built in this project."
+  >
+    <Pipeline />
+    <p class="caption mt-4">Every run lives in its own directory named by a digest of its inputs, so runs never overwrite each other. 552 automated tests run on the laptop, no GPU needed.</p>
+  </Section>
+
+  <!-- 5. World alignment -->
+  <Section
+    id="alignment"
+    eyebrow="World alignment"
+    title="Standing the object upright"
+    lead="The model anchors its world to the first camera, so the raw result inherits the angle the phone was held at. There is no gravity in the data."
+  >
+    <div class="grid items-start gap-8 lg:grid-cols-[1.4fr_1fr]">
+      <figure class="space-y-3">
+        <Img file="alignment_before_after.webp" />
+        <figcaption class="caption">The same point cloud before (left) and after (right) world alignment.</figcaption>
+      </figure>
+      <ul class="space-y-5">
+        <li class="flex gap-3">
+          <span class="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          <p class="leading-relaxed text-muted"><strong class="font-semibold text-fg">Vertical from camera positions.</strong> A handheld orbit keeps the cameras near one plane; its normal is the vertical. Positions do not depend on camera roll, so a tilted horizon does not bias it.</p>
+        </li>
+        <li class="flex gap-3">
+          <span class="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          <p class="leading-relaxed text-muted"><strong class="font-semibold text-fg">Centre from optical axes.</strong> Every camera looks at the object, so the point nearest to all optical axes is its centre — the background does not pull it.</p>
+        </li>
+        <li class="flex gap-3">
+          <span class="mt-2 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          <p class="leading-relaxed text-muted"><strong class="font-semibold text-fg">Recorded as an estimate.</strong> The transform is stored with the result, labelled as estimated from the camera trajectory; the raw output is never modified. A quality gate falls back to re-centring only.</p>
+        </li>
+      </ul>
+    </div>
+  </Section>
+
+  <!-- 6. Experiment P2 -->
+  <Section
+    id="p2"
+    eyebrow="Experiment P2"
+    title="Does smarter frame selection help?"
+    lead="Same video, same budget of 48 frames, same model. Uniform sampling in time against the sharpest frame per window without near-duplicate viewpoints — judged by a decision rule committed before the runs."
+  >
+    <div class="grid gap-6 sm:grid-cols-2">
+      <figure class="space-y-3">
+        <Img file="p2_uniform_front.webp" />
+        <figcaption class="caption"><span class="font-medium text-fg">Uniform selection</span>, threshold 1.8, front view: scattered fragments of the object.</figcaption>
+      </figure>
+      <figure class="space-y-3">
+        <Img file="p2_quality_front.webp" />
+        <figcaption class="caption"><span class="font-medium text-fg">Quality selection</span>, threshold 1.8, front view: the whole object, with a disc of table beneath it.</figcaption>
+      </figure>
+    </div>
+    <figure class="mt-8 space-y-3">
+      <div class="overflow-hidden rounded-xl border border-line" set:html={chartSvg('p2-frame-selection')} />
+      <figcaption class="caption">Points that pass the confidence threshold 1.8, per frame-selection method. The uniform baseline was run twice (0.5 % apart); the variant hit the upstream cap of 100,000 points.</figcaption>
+    </figure>
+    <p class="mt-6 max-w-3xl rounded-xl border border-line bg-surface p-4 text-sm leading-relaxed text-muted">
+      <strong class="font-semibold text-fg">How to read it.</strong> Threshold 1.8 is a stress test — at the working threshold 1.6
+      the uniform branch is already complete. The ×10 is a lower bound, because the variant hit the cap. The mechanism is not
+      established. One video; no generalization is claimed.
+    </p>
+  </Section>
+
+  <!-- 7. Honest limits -->
+  <Section id="limits" eyebrow="Honest limits" title="What the result does not claim">
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {limits.map((l) => (
+        <li class="card p-5">
+          <p class="font-semibold text-fg">{l.title}</p>
+          <p class="mt-1 text-sm leading-relaxed text-muted">{l.text}</p>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-10 flex flex-wrap items-center gap-3">
+      <a class="btn btn-primary" href={href('report/')}>Read the detailed report</a>
+      <button type="button" class="btn btn-ghost" data-open-viewer>Explore in 3D</button>
+    </div>
+  </Section>
+
+  <PointCloudDialog />
+</Base>
+
+<script>
+  // Play the turntable only when the reader has not asked for reduced motion.
+  const video = document.querySelector<HTMLVideoElement>('video[data-autoplay]');
+  if (video) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.controls = true;
+    } else {
+      video.autoplay = true;
+      video.play().catch(() => {
+        video.controls = true;
+      });
+    }
+  }
+</script>

@@ -1,0 +1,37 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { href, REPO_URL, SITE_TITLE } from '../lib/site';
+
+interface Props {
+  current: 'home' | 'report';
+}
+const { current } = Astro.props;
+const links = [
+  { label: 'Overview', url: href(), key: 'home' },
+  { label: 'Report', url: href('report/'), key: 'report' },
+];
+---
+<header class="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur-md">
+  <div class="container-page flex h-14 items-center justify-between gap-4">
+    <a href={href()} class="flex items-center gap-2 font-semibold tracking-tight text-fg">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="text-accent">
+        <g fill="currentColor">
+          <circle cx="6" cy="14" r="1.6"></circle><circle cx="10" cy="8" r="1.6"></circle><circle cx="14" cy="15" r="1.6"></circle>
+          <circle cx="18" cy="9" r="1.6"></circle><circle cx="12" cy="19" r="1.3" opacity=".6"></circle><circle cx="15" cy="4.5" r="1.1" opacity=".6"></circle>
+        </g>
+      </svg>
+      {SITE_TITLE}
+    </a>
+    <nav aria-label="Main" class="flex items-center gap-1 text-sm">
+      {links.map((l) => (
+        <a
+          href={l.url}
+          aria-current={current === l.key ? 'page' : undefined}
+          class:list={['rounded-full px-3 py-1.5 transition-colors hover:text-fg', current === l.key ? 'text-fg bg-surface' : 'text-muted']}
+        >{l.label}</a>
+      ))}
+      <a href={REPO_URL} rel="noopener" class="hidden rounded-full px-3 py-1.5 text-muted transition-colors hover:text-fg sm:inline-block">GitHub</a>
+      <span class="ml-1"><ThemeToggle /></span>
+    </nav>
+  </div>
+</header>

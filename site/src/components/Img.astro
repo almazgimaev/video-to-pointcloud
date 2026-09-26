@@ -1,0 +1,20 @@
+---
+import { altOf, asset, assetUrl } from '../lib/assets';
+
+interface Props {
+  file: string;
+  class?: string;
+  eager?: boolean;
+}
+const { file, class: className, eager = false } = Astro.props;
+const info = asset(file);
+---
+<img
+  src={assetUrl(file)}
+  alt={altOf(file)}
+  width={info.width}
+  height={info.height}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding="async"
+  class:list={['block h-auto w-full rounded-xl border border-line bg-surface', className]}
+/>

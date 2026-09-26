@@ -119,11 +119,15 @@ def make_video(path: Path) -> Path:
     return path
 
 
-def make_scene(out_dir: Path, *, frames_json: Path, cameras: int) -> Path:
+def make_scene(
+    out_dir: Path, *, frames_json: Path, cameras: int, image_size: tuple[int, int]
+) -> Path:
     """A synthetic COLMAP model under the frame names of a specific run.
 
     The names are taken from `frames.json` via the standard `--names-from` flag: putting them
     in by hand would mean forging the correspondence between the model and the selected frames.
+    The camera image size equals the size of the prepared frames, so intrinsics and frames
+    describe the same pixels.
     """
     _run(
         [
@@ -139,6 +143,9 @@ def make_scene(out_dir: Path, *, frames_json: Path, cameras: int) -> Path:
             str(SCENE_SEED),
             "--names-from",
             str(frames_json),
+            "--image-size",
+            str(image_size[0]),
+            str(image_size[1]),
         ],
         what="synthetic scene generation",
     )
@@ -246,6 +253,8 @@ def build_sample(target: Path = SAMPLE_DIR) -> dict:
         raise RuntimeError(f"the synthetic scene generator is missing: {MAKE_SCENE}")
 
     # Import inside the function: first check the environment, then touch the package.
+    from PIL import Image
+
     from v3d.ingest import run_ingest
     from v3d.prepare import run_prepare
 
@@ -263,10 +272,14 @@ def build_sample(target: Path = SAMPLE_DIR) -> dict:
                 jpeg_quality=JPEG_QUALITY,
             )
         selected = [r for r in prepared.records if r.selected]
+        first_frame = prepared.layout.package_images / Path(selected[0].image_file).name
+        with Image.open(first_frame) as frame:
+            frame_size = frame.size
         scene = make_scene(
             work / "scene",
             frames_json=prepared.layout.frames,
             cameras=len(selected),
+            image_size=frame_size,
         )
         ingested = run_ingest(prepared.layout.root, source=scene, precomputed_example=True)
         summary = {

@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "run_id": "20260926-211709-07dadd2e",
+  "run_id": "20260926-214913-70604779",
   "frames": {
     "frames_total": 40,
     "frames_selected": 12,
@@ -67,7 +67,7 @@
     ]
   },
   "stage_durations_s": {
-    "ingest": 0.042
+    "ingest": 0.089
   },
   "artifact_sizes_bytes": {
     "normalized/points.ply": 5003,

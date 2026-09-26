@@ -274,6 +274,32 @@ def cmd_visual_check(args: argparse.Namespace) -> int:
     return ExitCode.OK
 
 
+def cmd_media(args: argparse.Namespace) -> int:
+    """Build presentation media (renders, turntable, pairs, trajectory) from a stored run."""
+    from pathlib import Path
+
+    from v3d.media import build_media
+
+    out = getattr(args, "out", None)
+    index = build_media(
+        Path(args.run_dir),
+        out_dir=Path(out) if out else None,
+        size=getattr(args, "size", None) or 900,
+        turntable_frames=getattr(args, "frames", None) or 72,
+    )
+    if getattr(args, "json", False):
+        print(json.dumps(index, ensure_ascii=False, indent=2))
+        return ExitCode.OK
+
+    say(args, f"run: {index['run_id']}")
+    for asset in index["assets"]:
+        say(args, f"  {asset['file']}: {asset['what']}")
+    if index.get("skipped_pairs"):
+        for skipped in index["skipped_pairs"]:
+            say(args, f"  skipped pair for {skipped['frame_id']}: {skipped['reason']}")
+    return ExitCode.OK
+
+
 def cmd_compare(args: argparse.Namespace) -> int:
     """Compare two runs of experiment P2 under pre-fixed conditions."""
     raise NotImplementedError("the comparison stage is not implemented yet (task T051)")
@@ -422,6 +448,23 @@ def build_parser() -> argparse.ArgumentParser:
         "--list", action="store_true", help="print all items with result, note and time"
     )
     p_visual.set_defaults(func=cmd_visual_check)
+
+    p_media = subparsers.add_parser(
+        "media",
+        parents=[common],
+        help="build presentation media (renders, turntable, pairs, trajectory) from a run",
+    )
+    p_media.add_argument("run_dir", help="run directory runs/<run_id>")
+    p_media.add_argument(
+        "--out", default=None, help="output directory; without the flag — <run_dir>/media"
+    )
+    p_media.add_argument(
+        "--size", type=int, default=None, help="render size in pixels (default 900)"
+    )
+    p_media.add_argument(
+        "--frames", type=int, default=None, help="turntable frame count (default 72)"
+    )
+    p_media.set_defaults(func=cmd_media)
 
     p_compare = subparsers.add_parser(
         "compare",

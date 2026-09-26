@@ -29,7 +29,7 @@ mark permanently.
 
 ## Numbers of this example
 
-- `run_id`: `20260926-211709-07dadd2e`
+- `run_id`: `20260926-214913-70604779`
 - status: `success`
 - frames selected: 12
 - cameras registered: 12

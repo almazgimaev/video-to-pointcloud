@@ -551,12 +551,35 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="amplitude of the vertical wave height += A * sin(2 * phi)",
     )
     parser.add_argument(
+        "--image-size",
+        type=int,
+        nargs=2,
+        metavar=("W", "H"),
+        default=None,
+        help="camera image size; focal lengths scale with the width (default 640x480)",
+    )
+    parser.add_argument(
         "--names-from",
         type=Path,
         default=None,
         help="the run's frames.json: image names are taken from the selected frames",
     )
     return parser.parse_args(argv)
+
+
+def _image_size_fields(size: list[int] | None) -> dict:
+    """SceneParams fields for a camera of ``size``; focal lengths keep the default field of view."""
+    if size is None:
+        return {}
+    width, height = int(size[0]), int(size[1])
+    defaults = SceneParams()
+    scale = width / defaults.width
+    return {
+        "width": width,
+        "height_px": height,
+        "fx": defaults.fx * scale,
+        "fy": defaults.fy * scale,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -592,6 +615,7 @@ def main(argv: list[str] | None = None) -> int:
         tilt_axis=tuple(args.tilt_axis),
         offset=tuple(args.offset),
         non_planar=args.non_planar,
+        **_image_size_fields(args.image_size),
     )
     info = make_scene(args.out, params)
     print(f"written: {info['sparse_dir']}")

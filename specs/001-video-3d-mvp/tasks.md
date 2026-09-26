@@ -206,11 +206,11 @@ every push.
 
 **Goal**: reproducible media from stored run artifacts, without a GPU (FR-050…FR-052).
 
-- [ ] T077 [US3] Implement `src/v3d/render.py`: perspective point splatting with depth sort (numpy + Pillow), fixed views, point size and background; caption with `run_id` and source
-- [ ] T078 [US3] Turntable animation (frames → WebP and MP4 via ffmpeg) and a video-frame-versus-render pair from the same camera pose using stored intrinsics
-- [ ] T079 [P] [US3] Camera-trajectory figure and deterministic web decimation of `normalized/points.ply` labelled "N of M points" (FR-052)
-- [ ] T080 [US3] Add `v3d media <run>` in `src/v3d/cli.py` writing to `runs/<id>/media/` with a `media.json` index (what each file shows, source, `run_id`)
-- [ ] T081 [P] [US3] Tests `tests/unit/test_render.py`: deterministic output, captions present, decimation count and labelling, render from a synthetic camera pose projects the scene centre to the principal point
+- [X] T077 [US3] Implement `src/v3d/render.py`: perspective point splatting with depth sort (numpy + Pillow), fixed views, point size and background; caption with `run_id` and source
+- [X] T078 [US3] Turntable animation (frames → WebP and MP4 via ffmpeg) and a video-frame-versus-render pair from the same camera pose using stored intrinsics
+- [X] T079 [P] [US3] Camera-trajectory figure and deterministic web decimation of `normalized/points.ply` labelled "N of M points" (FR-052)
+- [X] T080 [US3] Add `v3d media <run>` in `src/v3d/cli.py` writing to `runs/<id>/media/` with a `media.json` index (what each file shows, source, `run_id`)
+- [X] T081 [P] [US3] Tests `tests/unit/test_render.py`: deterministic output, captions present, decimation count and labelling, render from a synthetic camera pose projects the scene centre to the principal point
 
 **Checkpoint**: `v3d media` produces all assets for the README and the page.
 

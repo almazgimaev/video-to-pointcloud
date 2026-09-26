@@ -1,6 +1,6 @@
 Run the reconstruction on the GPU machine
 
-run_id: 20260926-211709-07dadd2e
+run_id: 20260926-214913-70604779
 
 Before running:
 
@@ -23,7 +23,7 @@ Before running:
 3. What to copy back:
    - the whole sparse/ directory,
    - the run log (upstream stdout) as is.
-   Put the copied files into runs/20260926-211709-07dadd2e/result/ (or pass them via v3d ingest --from).
+   Put the copied files into runs/20260926-214913-70604779/result/ (or pass them via v3d ingest --from).
    Do not mix result files from different runs.
 
 4. Integrity check before running (optional, does not require our code):

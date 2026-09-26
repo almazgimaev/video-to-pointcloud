@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "run_id": "20260926-211709-07dadd2e",
+  "run_id": "20260926-214913-70604779",
   "conventions": {
     "artifact_type": "point_cloud",
     "transform_direction": "world_to_camera",
@@ -77,15 +77,15 @@
     {
       "frame_id": "0000_000000",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -119,15 +119,15 @@
     {
       "frame_id": "0001_000004",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -161,15 +161,15 @@
     {
       "frame_id": "0002_000007",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -203,15 +203,15 @@
     {
       "frame_id": "0003_000011",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -245,15 +245,15 @@
     {
       "frame_id": "0004_000014",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -287,15 +287,15 @@
     {
       "frame_id": "0005_000018",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -329,15 +329,15 @@
     {
       "frame_id": "0006_000021",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -371,15 +371,15 @@
     {
       "frame_id": "0007_000025",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -413,15 +413,15 @@
     {
       "frame_id": "0008_000028",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -455,15 +455,15 @@
     {
       "frame_id": "0009_000032",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -497,15 +497,15 @@
     {
       "frame_id": "0010_000035",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [
@@ -539,15 +539,15 @@
     {
       "frame_id": "0011_000039",
       "image_size": [
-        640,
-        480
+        320,
+        240
       ],
       "intrinsics": {
         "model": "PINHOLE",
-        "fx": 500.0,
-        "fy": 520.0,
-        "cx": 320.0,
-        "cy": 240.0
+        "fx": 250.0,
+        "fy": 260.0,
+        "cx": 160.0,
+        "cy": 120.0
       },
       "R_world_to_camera": [
         [

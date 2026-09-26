@@ -38,3 +38,6 @@ experiments/*/*
 site/dist/
 site/node_modules/
 site/.astro/
+
+# Published assets are part of the repository
+!docs/assets/*.mp4

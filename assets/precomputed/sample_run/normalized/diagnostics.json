@@ -1,0 +1,110 @@
+{
+  "schema_version": "1",
+  "run_id": "20260926-205546-6dd4e635",
+  "frames": {
+    "frames_total": 40,
+    "frames_selected": 12,
+    "reject_reason_counts": {
+      "budget_exhausted": 28
+    }
+  },
+  "cameras": {
+    "cameras_registered": 12,
+    "registration_ratio": {
+      "value": 1.0,
+      "availability": "available",
+      "meaning": "Share of selected frames that received a camera pose: cameras_registered / frames_selected. Shows the coverage of the selected set, but not the quality of poses."
+    }
+  },
+  "points": {
+    "num_points_raw": 300,
+    "num_points_valid": 300,
+    "valid_point_definition": "A point is valid if: (a) all three coordinates are finite (not NaN and not Inf); (b) the point made it into the reconstructor's result after its own confidence threshold; (c) the point was not discarded by our outlier filter.",
+    "has_colors": true,
+    "background_present": true,
+    "bbox": {
+      "value": [
+        [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "availability": "available",
+      "meaning": "Axis-aligned bounding box of the cloud in the reconstructor's world coordinates: [[xmin, ymin, zmin], [xmax, ymax, zmax]]. Units are unknown, scale is not determined, so the box size is not a measurement of the object."
+    },
+    "filters_applied": [
+      {
+        "name": "iqr_per_axis",
+        "k": 3.0,
+        "num_points_before": 300,
+        "num_points_after": 300,
+        "num_non_finite_removed": 0,
+        "num_outliers_removed": 0,
+        "bounds_per_axis": [
+          {
+            "axis": 0,
+            "lower": -2.80935887230354,
+            "upper": 2.723543052375393
+          },
+          {
+            "axis": 1,
+            "lower": -2.4250858585246733,
+            "upper": 2.419293881912499
+          },
+          {
+            "axis": 2,
+            "lower": -2.7029716952302607,
+            "upper": 2.7544077095039343
+          }
+        ]
+      }
+    ]
+  },
+  "stage_durations_s": {
+    "ingest": 0.089
+  },
+  "artifact_sizes_bytes": {
+    "normalized/points.ply": 4948,
+    "normalized/cameras.json": 10773,
+    "result/sparse": 131636
+  },
+  "reprojection_error": {
+    "value": 0.0,
+    "availability": "available",
+    "units": "px",
+    "meaning": "Mean reprojection error over the model in pixels: how far, on average, the observed projections of points diverge from their projections through the recovered poses. This is a measure of the model's internal consistency; by itself it does not prove geometric accuracy, scale or surface completeness."
+  },
+  "visual_check": {
+    "duplicated_geometry": {
+      "result": "not_checked",
+      "note": null
+    },
+    "camera_trajectory_break": {
+      "result": "not_checked",
+      "note": null
+    },
+    "point_soup_no_shape": {
+      "result": "not_checked",
+      "note": null
+    },
+    "holes_on_low_texture": {
+      "result": "not_checked",
+      "note": null
+    },
+    "background_dominates": {
+      "result": "not_checked",
+      "note": null
+    },
+    "color_inconsistency": {
+      "result": "not_checked",
+      "note": null
+    }
+  },
+  "interpretation_limits": "The number of points, model confidence and reprojection error are not proof of geometric accuracy or surface completeness. There is no independent reference, so metric accuracy and completeness are not claimed."
+}

@@ -1,0 +1,31 @@
+Run the reconstruction on the GPU machine
+
+run_id: 20260926-205546-6dd4e635
+
+Before running:
+
+    Check free GPU memory first (`nvidia-smi`). Measured cost of the reconstructor:
+    about 1 GiB + 0.27 GiB per frame.
+
+1. Upstream command (run in the directory of the reconstructor clone):
+
+    python demo_colmap.py --scene_dir=<path to package> --conf_thres_value 1.6
+
+   The directory of this package is passed as scene_dir; the images/ subdirectory already
+   contains only the selected frames in the right orientation.
+
+2. Expected output files (relative to the package directory):
+  - sparse/cameras.bin
+  - sparse/images.bin
+  - sparse/points3D.bin
+  - sparse/points.ply
+
+3. What to copy back:
+   - the whole sparse/ directory,
+   - the run log (upstream stdout) as is.
+   Put the copied files into runs/20260926-205546-6dd4e635/result/ (or pass them via v3d ingest --from).
+   Do not mix result files from different runs.
+
+4. Integrity check before running (optional, does not require our code):
+
+    sha256sum -c SHA256SUMS

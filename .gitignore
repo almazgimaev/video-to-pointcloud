@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Run directories and heavy artifacts
+runs/
+assets/videos/
+assets/precomputed/**/result/
+*.rrd
+
+# Experiments: ignore heavy artifacts, keep condition and result records in git
+experiments/*
+!experiments/*/
+experiments/*/*
+!experiments/*/conditions.json
+!experiments/*/results.json
+!experiments/*/comparison.md
+
+# Model weights
+*.safetensors
+*.ckpt
+*.pth
+
+# Videos
+*.mp4
+*.mov
+*.MOV
+
+# macOS
+.DS_Store
+
+# Static site build output
+site/dist/
+site/node_modules/
+site/.astro/

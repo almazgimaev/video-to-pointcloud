@@ -1,0 +1,54 @@
+"""Default parameters.
+
+Project rule: thresholds that affect the result are not assigned by eye.
+Values marked PRELIMINARY are justified not by measurement but by the need to start
+somewhere; they must be revisited after the first successful end-to-end run (M1,
+task T045) and until then are shown in the report with a corresponding note.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+# Values not yet justified by measurement (see plan.md §2, question Q3).
+#
+# frame_budget is justified by the M1 measurement (2026-09-20, docs/m1-feasibility.md): the
+# reconstructor's memory use is ≈ 1 GiB + 0.27 GiB per frame, and about 18 GB of GPU memory
+# is available. 48 frames take ≈ 13.8 GiB — this is the measured ceiling, so it was chosen.
+#
+# min_frames remains preliminary: reconstruction has never been run with fewer than 24
+# frames, so where the boundary of usability lies is unknown.
+PRELIMINARY_DEFAULTS = frozenset({"min_frames"})
+
+
+@dataclass(frozen=True)
+class Defaults:
+    """Default values for data preparation."""
+
+    frame_budget: int = 48
+    min_frames: int = 12
+    long_side_px: int = 1024
+    jpeg_quality: int = 95
+    seed: int = 42
+    outlier_iqr_k: float = 3.0
+    # Threshold of difference between neighbouring views for quality_nonredundant selection.
+    # Tuned on a separate tuning video (task T049), not on the evaluation set.
+    redundancy_diff_threshold: float | None = None
+
+
+DEFAULTS = Defaults()
+
+
+def is_preliminary(name: str) -> bool:
+    """True if the parameter value is not yet justified by measurement."""
+    return name in PRELIMINARY_DEFAULTS
+
+
+def preliminary_note(name: str) -> str | None:
+    """Note text for the report; None if the value is justified."""
+    if not is_preliminary(name):
+        return None
+    return (
+        f"value '{name}' is preliminary: chosen before the first end-to-end run and "
+        "not justified by measurement (see M1, task T045)"
+    )

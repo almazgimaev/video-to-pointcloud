@@ -1,0 +1,150 @@
+{
+  "run_id": "20260926-205546-6dd4e635",
+  "created_utc": "2026-09-26T20:55:46.188653+00:00",
+  "input_video": {
+    "path": "sample.mp4",
+    "filename": "sample.mp4",
+    "sha256": "a18949bdd54fe4497374409419cfab64a03e23feb2ecdd8a204609c996bf0f36",
+    "size_bytes": 17311,
+    "container": "mp4",
+    "video_codec": "h264",
+    "duration_s": 4.0,
+    "width": 320,
+    "height": 240,
+    "avg_fps": 10.0,
+    "nb_frames": 40,
+    "rotation_deg": 0,
+    "supported": true
+  },
+  "image_transform": {
+    "rotation_applied_deg": 0,
+    "source_size": [
+      320,
+      240
+    ],
+    "resize_mode": "long_side",
+    "resized_size": [
+      320,
+      240
+    ],
+    "scale_factor": 1.0,
+    "crop": null,
+    "jpeg_quality": 85,
+    "candidate_stride": 1,
+    "candidates_total": 40,
+    "timestamp_source": "container_pts"
+  },
+  "selection": {
+    "selector": "uniform",
+    "params": {
+      "selector": "uniform",
+      "budget": 12,
+      "long_side": 320,
+      "jpeg_quality": 85,
+      "max_candidates": 600,
+      "min_frames": 12
+    },
+    "candidates_considered": 40,
+    "selected": 12,
+    "reject_reasons": {
+      "budget_exhausted": 28
+    },
+    "preliminary": [
+      null,
+      "value 'min_frames' is preliminary: chosen before the first end-to-end run and not justified by measurement (see M1, task T045)"
+    ]
+  },
+  "seed": 42,
+  "code_id": {
+    "value": "33d50d9bcd3e66c8deb69fb764e5e84e1778e349",
+    "source": "git",
+    "working_tree_dirty": true,
+    "dirty_files": [
+      "gitignore",
+      ".specify/memory/constitution.md",
+      "README.md",
+      "assets/precomputed/make_sample.py",
+      "assets/synthetic/make_scene.py",
+      "docs/baseline.md",
+      "docs/internal-interfaces.md",
+      "docs/m1-feasibility.md",
+      "docs/shooting-guide.md",
+      "pyproject.toml",
+      "specs/001-video-3d-mvp/checklists/requirements.md",
+      "specs/001-video-3d-mvp/contracts/cli.md",
+      "specs/001-video-3d-mvp/contracts/errors.md",
+      "specs/001-video-3d-mvp/contracts/reconstructor-io.md",
+      "specs/001-video-3d-mvp/contracts/run-package.md",
+      "specs/001-video-3d-mvp/data-model.md",
+      "specs/001-video-3d-mvp/plan.md",
+      "specs/001-video-3d-mvp/quickstart.md",
+      "specs/001-video-3d-mvp/research.md",
+      "specs/001-video-3d-mvp/spec.md",
+      "specs/001-video-3d-mvp/tasks.md",
+      "src/v3d/artifacts.py",
+      "src/v3d/cli.py",
+      "src/v3d/colmap_io.py",
+      "src/v3d/config.py",
+      "src/v3d/diagnostics.py",
+      "src/v3d/errors.py",
+      "src/v3d/export.py",
+      "src/v3d/extract.py",
+      "src/v3d/geometry.py",
+      "src/v3d/ingest.py",
+      "src/v3d/ingest_checks.py",
+      "src/v3d/metrics.py",
+      "src/v3d/package.py",
+      "src/v3d/ply_io.py",
+      "src/v3d/prepare.py",
+      "src/v3d/probe.py",
+      "src/v3d/report.py",
+      "src/v3d/runid.py",
+      "src/v3d/runs.py",
+      "src/v3d/select/checks.py",
+      "src/v3d/select/uniform.py",
+      "src/v3d/status.py",
+      "src/v3d/viewer.py",
+      "src/v3d/warnings_.py",
+      "tests/contract/test_artifacts.py",
+      "tests/contract/test_export.py",
+      "tests/contract/test_package.py",
+      "tests/contract/test_report.py",
+      "tests/integration/test_extract.py",
+      "tests/integration/test_ingest_synthetic.py",
+      "tests/integration/test_precomputed_sample.py",
+      "tests/integration/test_prepare.py",
+      "tests/unit/test_colmap_io.py",
+      "tests/unit/test_diagnostics.py",
+      "tests/unit/test_errors.py",
+      "tests/unit/test_geometry.py",
+      "tests/unit/test_ingest_checks.py",
+      "tests/unit/test_metrics.py",
+      "tests/unit/test_ply_io.py",
+      "tests/unit/test_probe.py",
+      "tests/unit/test_select_uniform.py",
+      "tests/unit/test_status.py",
+      "tests/unit/test_viewer.py",
+      "tests/contract/test_repo_hygiene.py"
+    ]
+  },
+  "environment": {
+    "stage": "mac_light_contour",
+    "python": "3.12.10",
+    "platform": "macOS-26.5-arm64-arm-64bit"
+  },
+  "commands": [
+    {
+      "command": "prepare",
+      "durations_s": {
+        "check": 0.063,
+        "extract": 0.207,
+        "metrics": 0.029,
+        "select": 0.009,
+        "package": 0.006
+      }
+    }
+  ],
+  "reconstructor": null,
+  "forced_overwrite": false,
+  "schema_version": "1"
+}

@@ -1,0 +1,60 @@
+<svg class="viz" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 308" role="img" aria-labelledby="p2-frame-selection-t p2-frame-selection-d" font-size="12">
+<title id="p2-frame-selection-t">Sharper, non-redundant frames keep the whole object</title>
+<desc id="p2-frame-selection-d">Uniform selection kept 9,346 points and its repeat 9,297, a 0.5 percent difference. Quality, non-redundant selection reached the upstream cap of 100,000 points, so its true count is higher. The difference is far larger than run-to-run variation.</desc>
+<style>
+svg.viz { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+.bg { fill: #fcfcfb; }
+.title { fill: #0b0b0b; font-size: 16px; font-weight: 600; }
+.sub { fill: #52514e; font-size: 12.5px; }
+.tick { fill: #898781; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.label { fill: #0b0b0b; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.label-2 { fill: #52514e; font-size: 12px; }
+.note { fill: #898781; font-size: 11.5px; }
+.grid { stroke: #e1e0d9; stroke-width: 1; }
+.axis { stroke: #c3c2b7; stroke-width: 1; }
+.ref { stroke: #898781; stroke-width: 1.5; stroke-dasharray: 4 4; }
+.s1 { fill: #2a78d6; }
+.s2 { fill: #eb6834; }
+.line-s1 { stroke: #2a78d6; stroke-width: 2; fill: none; }
+.line-est { stroke: #2a78d6; stroke-width: 2; fill: none; stroke-dasharray: 6 5; }
+.dot-est { fill: #fcfcfb; stroke: #2a78d6; stroke-width: 2; }
+.mark:hover { opacity: 0.85; }
+@media (prefers-color-scheme: dark) {
+  .bg { fill: #1a1a19; }
+  .title, .label { fill: #ffffff; }
+  .sub, .label-2 { fill: #c3c2b7; }
+  .grid { stroke: #2c2c2a; }
+  .axis { stroke: #383835; }
+  .s1 { fill: #3987e5; }
+  .s2 { fill: #d95926; }
+  .line-s1, .line-est { stroke: #3987e5; }
+  .dot-est { fill: #1a1a19; stroke: #3987e5; }
+}
+</style>
+<rect class="bg" x="0" y="0" width="720" height="308" rx="12"/>
+<text class="title" x="24" y="28">Sharper, non-redundant frames keep the whole object</text>
+<text class="sub" x="24" y="47">Points that pass a strict confidence threshold, per frame-selection method</text>
+<line class="grid" x1="174.0" x2="174.0" y1="80" y2="252"/>
+<text class="tick" x="174.0" y="270" text-anchor="middle">0k</text>
+<line class="grid" x1="275.8" x2="275.8" y1="80" y2="252"/>
+<text class="tick" x="275.8" y="270" text-anchor="middle">25k</text>
+<line class="grid" x1="377.6" x2="377.6" y1="80" y2="252"/>
+<text class="tick" x="377.6" y="270" text-anchor="middle">50k</text>
+<line class="grid" x1="479.5" x2="479.5" y1="80" y2="252"/>
+<text class="tick" x="479.5" y="270" text-anchor="middle">75k</text>
+<line class="grid" x1="581.3" x2="581.3" y1="80" y2="252"/>
+<text class="tick" x="581.3" y="270" text-anchor="middle">100k</text>
+<line class="ref" x1="581.3" x2="581.3" y1="74" y2="252"/>
+<text class="label-2" x="581.3" y="68" text-anchor="middle">upstream cap</text>
+<text class="label" x="162" y="109.0" text-anchor="end">Uniform</text>
+<path class="mark s1" d="M174.0,90.0 L208.1,90.0 Q212.1,90.0 212.1,94.0 L212.1,116.0 Q212.1,120.0 208.1,120.0 L174.0,120.0 Z"><title>Uniform: 9,346 points at threshold 1.8</title></path>
+<text class="label" x="220.1" y="109.0">9,346</text>
+<text class="label" x="162" y="171.0" text-anchor="end">Uniform, repeat</text>
+<path class="mark s1" d="M174.0,152.0 L207.9,152.0 Q211.9,152.0 211.9,156.0 L211.9,178.0 Q211.9,182.0 207.9,182.0 L174.0,182.0 Z"><title>Uniform, repeat: 9,297 points at threshold 1.8</title></path>
+<text class="label" x="219.9" y="171.0">9,297</text>
+<text class="label" x="162" y="233.0" text-anchor="end">Quality, non-redundant</text>
+<path class="mark s2" d="M174.0,214.0 L577.3,214.0 Q581.3,214.0 581.3,218.0 L581.3,240.0 Q581.3,244.0 577.3,244.0 L174.0,244.0 Z"><title>Quality, non-redundant: ≥ 100,000 points at threshold 1.8</title></path>
+<text class="label" x="589.3" y="233.0">≥ 100,000</text>
+<line class="axis" x1="174" x2="174" y1="80" y2="252"/>
+<text class="note" x="24" y="296">Same video, 48 frames, threshold 1.8 (a stress test). Verdict by the rule fixed before the runs: improvement.</text>
+</svg>

@@ -1,98 +1,100 @@
 # Video-to-3D
 
-A personal learning project: reconstructing a 3D representation of a single static object
-from ordinary RGB phone video.
+**From a phone video of an object to a coloured 3D point cloud — with honest diagnostics.**
 
-> **Status: in development, the end-to-end path has not yet been verified on real video.**
-> No reconstruction has been run yet. The capabilities below describe the designed behavior,
-> not an achieved result.
+![First video frame next to a render of the reconstruction from the same camera pose](docs/assets/pair_0000_000000.webp)
 
-## What it does (v1 goal)
+*Left: a frame of the input video. Right: the reconstructed point cloud, rendered from the camera
+pose estimated for that frame.*
 
-Input — one video of a static textured object, shot by walking around it.
-Output:
+A small, end-to-end tool built as a learning and portfolio project in 3D perception. You record a
+short orbit around a static object; the tool selects frames, hands them to a reconstruction model
+running on a GPU machine, brings the result back, stands the object upright, and lets you inspect,
+export and measure it.
 
-- a colored **point cloud** (`point_cloud`) — **not** a mesh, **not** a textured model,
-  **not** a Gaussian splat;
-- camera poses for the viewpoints used;
-- interactive viewing on the Mac;
-- export of the point cloud to PLY;
-- metadata and a run report.
+- **Detailed report** — every step, measurement and failure: [`docs/report/report.md`](docs/report/report.md)
+- **Project page** — a visual walk-through with an interactive 3D view: [`site/`](site/)
 
-## Honest limitations
+## Results
 
-- **The scale is not determined** (`scale_status: not_determined`): there is no independent ground truth,
-  so metric accuracy and surface completeness are neither claimed nor measured.
-- **The background is not removed.** Residual background in the result is normal for v1, and it is marked
-  (`background_present: true`). Automatic segmentation of the object is not promised.
-- The number of points, the model's confidence and the reprojection error are **not** proof
-  of geometric accuracy.
-- Input is limited: MP4/MOV containers, H.264/HEVC codecs. "Any video"
-  is not supported.
-- There is no real-time operation; the heavy stage runs separately on a machine with a GPU.
-
-## Architecture in brief
-
-| Stage | Where | What it does |
-|---|---|---|
-| Light | Mac | video check, frame extraction and selection, building the transfer package, ingesting the result, normalization, viewing, export, report |
-| Heavy | GPU machine | reconstruction by the **upstream's standard script**; the project's own code is not moved there |
-
-Exchange between the stages is via files, the transfer is manual and documented
-(see `specs/001-video-3d-mvp/contracts/run-package.md`).
-
-## Glossary
-
-These names are used in all documents, messages and directory names. No synonyms
-are introduced.
-
-| Term | Meaning | Where on disk |
-|---|---|---|
-| **run** | one unit of work: one video from preparation to result | `runs/<run_id>/` |
-| **transfer package** (also: package) | a self-contained directory for transfer to the GPU machine | `runs/<run_id>/package/` |
-| **reconstruction result** | the upstream's output as is, COLMAP sparse format | `runs/<run_id>/result/` |
-| **normalized result** | the representation converted to our conventions | `runs/<run_id>/normalized/` |
-| **run report** | a human-readable summary of the run | `runs/<run_id>/report.md` |
-
-## Borrowed / built by the author
-
-| Taken | Why |
+| | |
 |---|---|
-| VGGT + `facebook/VGGT-1B` weights | single-pass reconstruction |
-| COLMAP sparse format | a single result contract |
-| `pycolmap` | reading the binary model |
-| Rerun | interactive viewing |
-| ffmpeg / ffprobe | decoding and frame orientation |
+| Input | 26.5 s phone video, 1920×1080 |
+| Camera poses | 48 of 48 frames registered, full orbit |
+| Output | coloured point cloud, upright and centred; PLY export |
+| Frame selection experiment | selecting sharp, non-redundant frames keeps the whole object under a strict threshold where uniform sampling keeps fragments — judged by a rule fixed before the runs |
+| Tests | 552, all on a laptop, no GPU |
 
-Built by the author: frame preparation and selection, the transfer contract and integrity check, the data
-model and coordinate conventions, diagnostics and report, error and status handling, the viewing
-layout, an experiment comparing frame selection methods.
+| Front | Three-quarter | Top |
+|---|---|---|
+| ![](docs/assets/view_front.webp) | ![](docs/assets/view_three_quarter.webp) | ![](docs/assets/view_top.webp) |
 
-## Licenses
+## How it works
 
-- Project code — see `LICENSE` (to be added).
-- The `facebook/VGGT-1B` weights are distributed under **CC-BY-NC-4.0** — non-commercial
-  use only. The project is educational, and this restriction is respected.
-- VGGT code — the upstream license; COLMAP — BSD.
+```
+video ─► check ─► select frames ─► transfer package ─► reconstruct (GPU) ─► ingest ─► view / export / report
+        └──────────────── laptop ────────────────┘   └── separate machine ──┘  └────── laptop ──────┘
+```
 
-## Installation (Mac)
+- **Reconstruction**: [VGGT](https://github.com/facebookresearch/vggt) (`VGGT-1B`), run with its
+  own script — no project code on the GPU machine. The two sides exchange files, with checksums.
+- **World alignment**: the model anchors its world to the first camera, so the raw result is
+  tilted. The vertical is estimated from the ring of camera positions, the object is centred, and
+  the transform is recorded as an estimate.
+
+  ![Before and after alignment](docs/assets/alignment_before_after.webp)
+
+- **Frame selection**: uniform in time, or sharpest-per-window without near-duplicate views.
+- **Diagnostics**: registered cameras, valid points, timings, a visual-check record, and explicit
+  "unavailable: reason" instead of made-up numbers.
+
+## What the numbers do not claim
+
+- **Scale is not determined** — there is no independent reference, so no metric accuracy or
+  surface completeness is claimed.
+- **The result is a point cloud**, not a mesh. Residual background is kept and marked.
+- **The vertical is an estimate** from the camera trajectory, not a measurement.
+- **One real capture** was measured. The frame-selection result is not generalized.
+
+## Try it
 
 ```bash
 brew install ffmpeg
-make install          # venv + dependencies
-make test             # automated checks
+make install                                   # venv + dependencies
+make test
+
+.venv/bin/v3d check video.mp4
+.venv/bin/v3d prepare video.mp4 --out runs     # prints run_id and the transfer package path
+# reconstruct the package on a GPU machine (see the report, section 7), copy sparse/ back, then:
+.venv/bin/v3d ingest runs/<run_id>
+.venv/bin/v3d view runs/<run_id>
+.venv/bin/v3d media runs/<run_id>
 ```
 
-Pinned versions are in `requirements.lock`, updated with
-`.venv/bin/pip freeze --exclude-editable > requirements.lock`.
+A ready-made example that needs no GPU: `.venv/bin/v3d view assets/precomputed/sample_run`
+(a synthetic scene, marked as a precomputed example).
 
-## Shooting
+Recording tips: [`docs/shooting-guide.md`](docs/shooting-guide.md).
 
-Before your first shoot, read the [guide](docs/shooting-guide.md): which object
-is suitable, how to move around it, what the system checks itself and what it takes from you
-on trust. Shooting conditions are not checked automatically — meeting them is up to you.
+## Project layout
 
-## Documents
+| Path | What |
+|---|---|
+| `src/v3d/` | the tool: frame selection, transfer package, ingest, alignment, viewer, export, rendering |
+| `tests/` | unit, contract and integration tests, incl. a synthetic scene with known ground truth |
+| `docs/report/` | the detailed report, charts and the scripts that build them |
+| `docs/` | shooting guide, feasibility notes, the P2 experiment |
+| `experiments/` | conditions and results of the frame-selection experiment |
+| `specs/` | specification, plan, data model, contracts and tasks |
+| `site/` | the project page (static) |
 
-The specification, plan, data model and contracts are in `specs/001-video-3d-mvp/`.
-Project rules — `.specify/memory/constitution.md`.
+Terms used throughout: a **run** is one video processed end to end (`runs/<run_id>/`); the
+**transfer package** is what goes to the GPU machine (`package/`); the **normalized result** is the
+aligned output the tool works with (`normalized/`).
+
+## Licences
+
+- Project code: see `LICENSE` (to be added).
+- VGGT code: licence of the upstream repository. **`VGGT-1B` weights: CC-BY-NC-4.0** — non-commercial
+  use only; this project is non-commercial.
+- COLMAP format tooling (`pycolmap`): BSD.

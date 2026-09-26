@@ -1,0 +1,89 @@
+{
+  "note": "Images copied from local run directories by docs/report/build_assets.py. The main run 20260920-084926-91b5ed03 is the only run with the default settings (48 uniform frames, threshold 1.6), not the best of several.",
+  "assets": [
+    {
+      "file": "pair_0000_000000.webp",
+      "what": "first video frame next to a render from the same camera pose",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 1400,
+      "height": 413
+    },
+    {
+      "file": "pair_0032_000432.webp",
+      "what": "a later video frame next to a render from the same camera pose",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 1400,
+      "height": 413
+    },
+    {
+      "file": "view_front.webp",
+      "what": "point cloud, front view",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    },
+    {
+      "file": "view_three_quarter.webp",
+      "what": "point cloud, three-quarter view",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    },
+    {
+      "file": "view_top.webp",
+      "what": "point cloud, top view",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    },
+    {
+      "file": "trajectory.webp",
+      "what": "camera trajectory: 48 registered cameras around the object",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    },
+    {
+      "file": "turntable.mp4",
+      "what": "turntable animation of the point cloud, 72 frames",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false
+    },
+    {
+      "file": "cloud_web.ply",
+      "what": "point cloud decimated for the web: 40,000 of 100,000 points",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false
+    },
+    {
+      "file": "alignment_before_after.webp",
+      "what": "the same cloud before and after world alignment",
+      "source_run": "20260920-084926-91b5ed03",
+      "selected_example": false,
+      "width": 1286,
+      "height": 670
+    },
+    {
+      "file": "p2_uniform_front.webp",
+      "what": "P2 at threshold 1.8, uniform selection, front view",
+      "source_run": "20260926-221214-e80ab63c",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    },
+    {
+      "file": "p2_quality_front.webp",
+      "what": "P2 at threshold 1.8, quality selection, front view",
+      "source_run": "20260926-221232-494c1365",
+      "selected_example": false,
+      "width": 900,
+      "height": 930
+    }
+  ]
+}

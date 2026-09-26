@@ -1,0 +1,61 @@
+<svg class="viz" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="confidence-threshold-t confidence-threshold-d" font-size="12">
+<title id="confidence-threshold-t">A small change of the threshold removes most points</title>
+<desc id="confidence-threshold-d">At thresholds 1.3 and 1.6 the reconstruction reached the upstream cap of 100,000 points; at 1.8 only 9,346 points remained. The upstream default 5.0 gave no points on 24 frames.</desc>
+<style>
+svg.viz { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+.bg { fill: #fcfcfb; }
+.title { fill: #0b0b0b; font-size: 16px; font-weight: 600; }
+.sub { fill: #52514e; font-size: 12.5px; }
+.tick { fill: #898781; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.label { fill: #0b0b0b; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.label-2 { fill: #52514e; font-size: 12px; }
+.note { fill: #898781; font-size: 11.5px; }
+.grid { stroke: #e1e0d9; stroke-width: 1; }
+.axis { stroke: #c3c2b7; stroke-width: 1; }
+.ref { stroke: #898781; stroke-width: 1.5; stroke-dasharray: 4 4; }
+.s1 { fill: #2a78d6; }
+.s2 { fill: #eb6834; }
+.line-s1 { stroke: #2a78d6; stroke-width: 2; fill: none; }
+.line-est { stroke: #2a78d6; stroke-width: 2; fill: none; stroke-dasharray: 6 5; }
+.dot-est { fill: #fcfcfb; stroke: #2a78d6; stroke-width: 2; }
+.mark:hover { opacity: 0.85; }
+@media (prefers-color-scheme: dark) {
+  .bg { fill: #1a1a19; }
+  .title, .label { fill: #ffffff; }
+  .sub, .label-2 { fill: #c3c2b7; }
+  .grid { stroke: #2c2c2a; }
+  .axis { stroke: #383835; }
+  .s1 { fill: #3987e5; }
+  .s2 { fill: #d95926; }
+  .line-s1, .line-est { stroke: #3987e5; }
+  .dot-est { fill: #1a1a19; stroke: #3987e5; }
+}
+</style>
+<rect class="bg" x="0" y="0" width="720" height="360" rx="12"/>
+<text class="title" x="24" y="28">A small change of the threshold removes most points</text>
+<text class="sub" x="24" y="47">48 uniformly selected frames; bars at the cap mean more points passed</text>
+<line class="grid" x1="74" x2="692" y1="304.0" y2="304.0"/>
+<text class="tick" x="66" y="308.0" text-anchor="end">0k</text>
+<line class="grid" x1="74" x2="692" y1="253.5" y2="253.5"/>
+<text class="tick" x="66" y="257.5" text-anchor="end">25k</text>
+<line class="grid" x1="74" x2="692" y1="203.1" y2="203.1"/>
+<text class="tick" x="66" y="207.1" text-anchor="end">50k</text>
+<line class="grid" x1="74" x2="692" y1="152.6" y2="152.6"/>
+<text class="tick" x="66" y="156.6" text-anchor="end">75k</text>
+<line class="grid" x1="74" x2="692" y1="102.2" y2="102.2"/>
+<text class="tick" x="66" y="106.2" text-anchor="end">100k</text>
+<line class="ref" x1="74" x2="692" y1="102.2" y2="102.2"/>
+<text class="label-2" x="692" y="94.2" text-anchor="end">upstream cap · 100,000 points</text>
+<path class="mark s1" d="M129.0,304.0 L129.0,106.2 Q129.0,102.2 133.0,102.2 L221.0,102.2 Q225.0,102.2 225.0,106.2 L225.0,304.0 Z"><title>threshold 1.3: ≥ 100,000 points (at the cap: more passed)</title></path>
+<text class="label" x="177.0" y="76.2" text-anchor="middle">≥ 100,000</text>
+<text class="tick" x="177.0" y="322" text-anchor="middle">1.3</text>
+<path class="mark s1" d="M335.0,304.0 L335.0,106.2 Q335.0,102.2 339.0,102.2 L427.0,102.2 Q431.0,102.2 431.0,106.2 L431.0,304.0 Z"><title>threshold 1.6: ≥ 100,000 points (at the cap: more passed)</title></path>
+<text class="label" x="383.0" y="76.2" text-anchor="middle">≥ 100,000</text>
+<text class="tick" x="383.0" y="322" text-anchor="middle">1.6</text>
+<path class="mark s1" d="M541.0,304.0 L541.0,289.1 Q541.0,285.1 545.0,285.1 L633.0,285.1 Q637.0,285.1 637.0,289.1 L637.0,304.0 Z"><title>threshold 1.8: 9,346 points</title></path>
+<text class="label" x="589.0" y="275.1" text-anchor="middle">9,346</text>
+<text class="tick" x="589.0" y="322" text-anchor="middle">1.8</text>
+<line class="axis" x1="74" x2="692" y1="304" y2="304"/>
+<text class="note" x="692" y="342" text-anchor="end">confidence threshold (--conf_thres_value)</text>
+<text class="note" x="24" y="350">The upstream default threshold 5.0 gave 0 points (measured on 24 frames).</text>
+</svg>

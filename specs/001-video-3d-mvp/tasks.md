@@ -220,12 +220,12 @@ every push.
 
 **Goal**: a reader understands the work in a minute and can dig into the details on click (FR-053, FR-054). Built after P2 so the content is written once.
 
-- [ ] T082 [US3] Write the detailed project report in `docs/report/` (M1 → alignment → P2 → decisions → measurements → failures), linking stored artifacts
-- [ ] T083 [US3] SVG charts for the report and the page (memory versus frames, confidence threshold versus points, P2 comparison) with a consistent palette
+- [X] T082 [US3] Write the detailed project report in `docs/report/` (M1 → alignment → P2 → decisions → measurements → failures), linking stored artifacts
+- [X] T083 [US3] SVG charts for the report and the page (memory versus frames, confidence threshold versus points, P2 comparison) with a consistent palette
 - [ ] T084 [US3] Scaffold `site/` with Astro + Tailwind; static output to `site/dist/` (gitignored); no analytics
 - [ ] T085 [US3] Landing page: input video frames next to renders, turntable, key numbers, links; detailed report page rendered from `docs/report/`
 - [ ] T086 [US3] Interactive 3D island (three.js `PLYLoader` + `OrbitControls`) loading the decimated PLY only on click, with the "N of M points" label (SC-019)
-- [ ] T087 [US3] Reader-facing `README.md`: what, how, results with visuals, honest limitations, links to the report and the page (supersedes T058)
+- [X] T087 [US3] Reader-facing `README.md`: what, how, results with visuals, honest limitations, links to the report and the page (supersedes T058)
 - [ ] T088 [US3] Verify: `npm run build`, open `site/dist/index.html` from disk, 3D not downloaded until requested, hygiene test green
 
 **Checkpoint**: the project is presentable; publication happens only on explicit request.

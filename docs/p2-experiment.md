@@ -113,8 +113,9 @@ reason (median distance from the centre 0.30 of the camera-ring radius against 0
   moderate increase in depth confidence becomes a huge jump in the count. The number does not
   mean "ten times better geometry"; it means the variant's depth is confident enough that the
   whole object survives a strict threshold, while the baseline's is not.
-- **At the working threshold 1.6 both look complete.** The practical gain is robustness: with
-  sharper frames the result no longer depends on a threshold tuned to the edge.
+- **At the working threshold 1.6 the uniform branch is already complete** (the M1 run on the same
+  48 uniform frames). The variant was not run at 1.6. The practical gain shown here is robustness:
+  with the variant's frames the object survives a stricter threshold.
 - **The mechanism is not established.** The variant's frames are only 5 % sharper by median,
   and 39 of the 48 frames differ between the branches; the redundancy rule never triggered.
   The effect may come from a few blurred or occluded frames in the uniform set rather than from

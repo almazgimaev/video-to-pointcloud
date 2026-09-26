@@ -176,7 +176,7 @@ every push.
 - [X] T064 Add `tests/contract/test_repo_hygiene.py`: only Latin/Greek-script letters, no absolute home paths, no wording about how the GPU machine is accessed or shared, no private patterns from the local notes file (FR-055, SC-020)
 - [X] T065 Amend the constitution to v3.1.0: English-only repository rule and infrastructure-privacy rule in "Scope and hardware constraints"
 - [X] T066 Create the local run-logistics notes file, excluded through `.git/info/exclude`, including the private-pattern block used by T064
-- [ ] T067 Push the repository to the private remote `video-to-pointcloud`; the hygiene test (T064) must pass before every push
+- [X] T067 Push the repository to the private remote `video-to-pointcloud`; the hygiene test (T064) must pass before every push
 
 **Checkpoint**: the repository is on the private remote; the hygiene test runs before every push.
 

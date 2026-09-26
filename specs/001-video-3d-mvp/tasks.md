@@ -138,13 +138,13 @@ comparison of the declared metrics; a negative result is accepted.
 
 **Dependency**: starts only after US1 is complete (a working end-to-end path is needed).
 
-- [ ] T046 [US2] Implement `quality_nonredundant` selection in `src/v3d/select/quality.py` per the algorithm in plan.md §7: windowed scheme (`budget` windows equal in time) → sharpest in the window → check the difference threshold `τ` → permitted shortfall of frames, recorded
-- [ ] T047 [US2] Measure and record the **cost of the selection itself** in `diagnostics.stage_durations_s.select` and as a separate line in the report (share of total time)
-- [ ] T048 [P] [US2] Selection tests in `tests/unit/test_select_quality.py`: the budget is never exceeded, coverage over time is preserved (at most one frame per window), determinism with a fixed seed, correct `redundant` marking
-- [ ] T049 [US2] Tune the threshold `τ` and window parameters on a **separate tuning video** in `assets/videos/tuning/`; forbid tuning on the evaluation set and record this decision in `docs/p2-experiment.md`
-- [ ] T050 [US2] Implement fixing of conditions in `src/v3d/compare.py`: `v3d compare --init` creates `experiments/<exp_id>/conditions.json` (video, budget, reconstructor and weights, seed, `code_id`, list of declared metrics) and makes it non-editable — changing the conditions = a new `exp_id`
-- [ ] T051 [US2] Implement comparison in `src/v3d/compare.py`: refuse with code 9 if anything other than the frame selection method differs; output `experiments/<exp_id>/{results.json, comparison.md}` with unavailable metrics marked and a verdict `improvement | no_difference | regression | inconclusive`
-- [ ] T052 [P] [US2] Comparison tests in `tests/contract/test_compare.py`: refusal when the video/budget/seed/reconstructor differ, correct verdict recording, immutability of `conditions.json`
+- [X] T046 [US2] Implement `quality_nonredundant` selection in `src/v3d/select/quality.py` per the algorithm in plan.md §7: windowed scheme (`budget` windows equal in time) → sharpest in the window → check the difference threshold `τ` → permitted shortfall of frames, recorded
+- [X] T047 [US2] Measure and record the **cost of the selection itself** in `diagnostics.stage_durations_s.select` and as a separate line in the report (share of total time)
+- [X] T048 [P] [US2] Selection tests in `tests/unit/test_select_quality.py`: the budget is never exceeded, coverage over time is preserved (at most one frame per window), determinism with a fixed seed, correct `redundant` marking
+- [X] T049 [US2] Tune the threshold `τ` and window parameters on a **separate tuning video** in `assets/videos/tuning/`; forbid tuning on the evaluation set and record this decision in `docs/p2-experiment.md`
+- [X] T050 [US2] Implement fixing of conditions in `src/v3d/compare.py`: `v3d compare --init` creates `experiments/<exp_id>/conditions.json` (video, budget, reconstructor and weights, seed, `code_id`, list of declared metrics) and makes it non-editable — changing the conditions = a new `exp_id`
+- [X] T051 [US2] Implement comparison in `src/v3d/compare.py`: refuse with code 9 if anything other than the frame selection method differs; output `experiments/<exp_id>/{results.json, comparison.md}` with unavailable metrics marked and a verdict `improvement | no_difference | regression | inconclusive`
+- [X] T052 [P] [US2] Comparison tests in `tests/contract/test_compare.py`: refusal when the video/budget/seed/reconstructor differ, correct verdict recording, immutability of `conditions.json`
 - [ ] T053 [US2] **(GPU)** Started manually by the author: run both branches of the experiment on one video with the same budget and seed; transfer the results, run `ingest` for each
 - [ ] T054 [US2] Run the comparison and record the outcome in `docs/p2-experiment.md`, including a visual check against the six defects and an explicit verdict; **keep a negative or neutral result as a valid outcome**, do not change conditions retroactively
 

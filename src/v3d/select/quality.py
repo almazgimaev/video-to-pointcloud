@@ -65,8 +65,9 @@ def select_quality_nonredundant(
     Returns:
         ``(records, info)``: records in the original order (unselected ones carry the reason:
         ``less_sharp_in_window`` — a sharper acceptable frame won the window; ``redundant`` —
-        sharper but too similar to the previous selected frame), and ``info`` with the parameters, window count,
-        the redundant fallbacks and the number of diff evaluations (the cost of selection).
+        sharper but too similar to the previous selected frame), and ``info`` with the
+        parameters, window count, the redundant fallbacks and the number of diff evaluations
+        (the cost of selection).
     """
     if tau < 0:
         raise ValueError("tau must be non-negative")

@@ -157,3 +157,14 @@ def reprojection_error_unavailable(reason: str) -> Warning_:
             "the consistency of the model in this run"
         ),
     )
+
+
+def orientation_not_estimated(reason: str) -> Warning_:
+    """The vertical of the scene could not be estimated from the camera trajectory."""
+    return Warning_(
+        code="orientation_not_estimated",
+        message=(
+            f"the vertical was not estimated from the camera trajectory ({reason}) — the result "
+            "is re-centred on the object but may be shown tilted"
+        ),
+    )

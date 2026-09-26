@@ -18,7 +18,18 @@ from dataclasses import dataclass
 #
 # min_frames remains preliminary: reconstruction has never been run with fewer than 24
 # frames, so where the boundary of usability lies is unknown.
-PRELIMINARY_DEFAULTS = frozenset({"min_frames"})
+#
+# The world-alignment gate thresholds are preliminary as well: measured on one real capture only
+# (pumpkin, 48 frames: planarity 0.055, arc 334°, sign agreement 0.77), far from the limits.
+PRELIMINARY_DEFAULTS = frozenset(
+    {
+        "min_frames",
+        "align_max_planarity",
+        "align_min_arc_deg",
+        "align_min_sign_agreement",
+        "align_min_cameras",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -34,6 +45,13 @@ class Defaults:
     # Threshold of difference between neighbouring views for quality_nonredundant selection.
     # Tuned on a separate tuning video (task T049), not on the evaluation set.
     redundancy_diff_threshold: float | None = None
+    # World-alignment quality gate (FR-047). Out-of-plane spread of camera centres relative to
+    # the smaller in-plane spread; angular span of the orbit; agreement between the ring normal
+    # and the mean camera "up"; minimum number of registered cameras.
+    align_max_planarity: float = 0.25
+    align_min_arc_deg: float = 180.0
+    align_min_sign_agreement: float = 0.3
+    align_min_cameras: int = 6
 
 
 DEFAULTS = Defaults()

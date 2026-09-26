@@ -12,6 +12,9 @@ What is generated
 -----------------
 - N cameras evenly placed on a circle of radius R around the origin
   (at height `--height`), all looking at the scene centre (0, 0, 0).
+  Optional distortions (arc, height jitter, roll jitter, vertical wave, whole-scene tilt and
+  offset) imitate a handheld orbit in an arbitrary frame; `expected.json` then records
+  `true_up_world` and `true_object_center` in the written frame.
 - The camera model is **PINHOLE** (`model_id = 1`, parameters `fx, fy, cx, cy`).
   It was chosen over SIMPLE_PINHOLE so that tests see separate fx/fy and
   catch swapped axes. All cameras share one `camera_id = 1`.
@@ -85,6 +88,41 @@ class SceneParams:
     # this way the scene can be fitted to the frame names of a specific run and result
     # ingest can be checked without forging frames.json.
     image_names: tuple[str, ...] = ()
+    # Distortions imitating a handheld phone orbit and a VGGT reconstruction. The scene is built
+    # in a canonical frame (up = +Z, object at the origin); the last two are then applied to the
+    # WHOLE scene as one rigid transform. Defaults reproduce the undistorted scene exactly.
+    arc_deg: float = 360.0  # cameras span only this arc of the circle
+    height_jitter: float = 0.0  # std-dev of random per-camera height offsets
+    roll_jitter_deg: float = 0.0  # std-dev of per-camera roll about the optical axis
+    tilt_deg: float = 0.0  # rotation of the whole scene about `tilt_axis`
+    tilt_axis: tuple[float, float, float] = (1.0, 0.0, 0.0)
+    offset: tuple[float, float, float] = (0.0, 0.0, 0.0)  # translation after the tilt
+    non_planar: float = 0.0  # amplitude A of the vertical wave: height += A * sin(2 * phi)
+
+
+def axis_angle_rotation(axis: np.ndarray, angle_rad: float) -> np.ndarray:
+    """Rotation matrix about `axis` (normalized internally) by `angle_rad` (Rodrigues)."""
+    axis = np.asarray(axis, dtype=np.float64)
+    norm = float(np.linalg.norm(axis))
+    if norm == 0.0:
+        raise ValueError("The rotation axis must be non-zero")
+    x, y, z = axis / norm
+    skew = np.array([[0.0, -z, y], [z, 0.0, -x], [-y, x, 0.0]])
+    return np.eye(3) + np.sin(angle_rad) * skew + (1.0 - np.cos(angle_rad)) * (skew @ skew)
+
+
+def global_transform(params: SceneParams) -> tuple[np.ndarray, np.ndarray]:
+    """Rigid transform `x' = G @ x + o` from the canonical frame to the written frame."""
+    if params.tilt_deg != 0.0:
+        rot = axis_angle_rotation(np.array(params.tilt_axis), np.deg2rad(params.tilt_deg))
+    else:
+        rot = np.eye(3)
+    return rot, np.array(params.offset, dtype=np.float64)
+
+
+def is_identity_transform(params: SceneParams) -> bool:
+    """True when the global transform does nothing (keeps default output byte-identical)."""
+    return params.tilt_deg == 0.0 and all(v == 0.0 for v in params.offset)
 
 
 def look_at_rotation(center: np.ndarray, target: np.ndarray) -> np.ndarray:
@@ -156,22 +194,55 @@ def rotation_to_quaternion(rot: np.ndarray) -> np.ndarray:
 def make_cameras(params: SceneParams) -> list[dict]:
     """Camera poses on a circle around the origin, all looking at the centre.
 
+    Cameras are first built in the canonical frame (up = +Z): arc, height jitter, vertical wave
+    and roll are applied there; then the global tilt/offset is applied to the poses.
+
     Returns a list of descriptions: image_id, file name, quaternion, translation vector and
-    the reference camera centre in the world.
+    the reference camera centre in the world (written frame).
     """
     target = np.zeros(3)
+    n = params.num_cameras
+    # Independent of the parameter values: draws are always made, so changing one jitter
+    # never changes the random values used by the other.
+    rng = np.random.default_rng(params.seed)
+    height_noise = rng.normal(0.0, 1.0, size=n) * params.height_jitter
+    roll_noise = np.deg2rad(rng.normal(0.0, 1.0, size=n) * params.roll_jitter_deg)
+
+    glob_rot, glob_off = global_transform(params)
+    identity = is_identity_transform(params)
+
     poses: list[dict] = []
-    for i in range(params.num_cameras):
-        angle = 2.0 * np.pi * i / params.num_cameras
+    for i in range(n):
+        if params.arc_deg == 360.0:
+            angle = 2.0 * np.pi * i / n
+        else:
+            # A partial arc: the first and the last camera sit at the arc ends.
+            angle = np.deg2rad(params.arc_deg) * (i / (n - 1) if n > 1 else 0.0)
+        cam_height = params.height
+        if params.height_jitter != 0.0:
+            cam_height = cam_height + float(height_noise[i])
+        if params.non_planar != 0.0:
+            cam_height = cam_height + params.non_planar * float(np.sin(2.0 * angle))
         center = np.array(
             [
                 params.radius * np.cos(angle),
                 params.radius * np.sin(angle),
-                params.height,
+                cam_height,
             ]
         )
         rot = look_at_rotation(center, target)
         tvec = -rot @ center
+        if params.roll_jitter_deg != 0.0:
+            # Rotation about the camera's own optical axis; the centre does not move.
+            cos_r, sin_r = float(np.cos(roll_noise[i])), float(np.sin(roll_noise[i]))
+            roll_rot = np.array([[cos_r, -sin_r, 0.0], [sin_r, cos_r, 0.0], [0.0, 0.0, 1.0]])
+            rot = roll_rot @ rot
+            tvec = roll_rot @ tvec
+        if not identity:
+            # x' = G x + o  =>  R' = R G^T, t' = t - R' o.
+            rot = rot @ glob_rot.T
+            tvec = tvec - rot @ glob_off
+            center = glob_rot @ center + glob_off
         # The frame index in the "source video" — deterministic arithmetic, not RNG.
         source_index = 12 + i * 35
         name = (
@@ -217,6 +288,11 @@ def make_points(params: SceneParams) -> tuple[np.ndarray, np.ndarray]:
     # Colour from position: (coordinate + half) / (2 * half) -> 0..255.
     normalized = (xyz + half) / (2.0 * half)
     rgb = np.clip(np.round(normalized * 255.0), 0, 255).astype(np.uint8)
+
+    # The colour is fixed by the canonical position; only then the whole scene is moved.
+    if not is_identity_transform(params):
+        glob_rot, glob_off = global_transform(params)
+        xyz = xyz @ glob_rot.T + glob_off
     return xyz, rgb
 
 
@@ -345,6 +421,7 @@ def write_expected_json(
     points2d: dict[int, list[tuple[float, float, int]]],
 ) -> None:
     """Reference for tests: parameters, poses, camera centres and observation statistics."""
+    glob_rot, glob_off = global_transform(params)
     payload = {
         "note": ("Synthetic scene: checks only formats and geometry, not reconstruction quality."),
         "params": {
@@ -355,6 +432,18 @@ def write_expected_json(
             "height": params.height,
             "cube_half_size": params.cube_half_size,
         },
+        "distortion": {
+            "arc_deg": params.arc_deg,
+            "height_jitter": params.height_jitter,
+            "roll_jitter_deg": params.roll_jitter_deg,
+            "tilt_deg": params.tilt_deg,
+            "tilt_axis": list(params.tilt_axis),
+            "offset": list(params.offset),
+            "non_planar": params.non_planar,
+        },
+        # Where the canonical up (+Z) and the canonical origin (object centre) ended up.
+        "true_up_world": [float(v) for v in glob_rot @ np.array([0.0, 0.0, 1.0])],
+        "true_object_center": [float(v) for v in glob_off],
         "camera": {
             "camera_id": CAMERA_ID,
             "model": "PINHOLE",
@@ -425,6 +514,43 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--height", type=float, default=1.0, help="height of the cameras above the XY plane"
     )
     parser.add_argument(
+        "--arc-deg", type=float, default=360.0, help="cameras span only this arc (default 360)"
+    )
+    parser.add_argument(
+        "--height-jitter", type=float, default=0.0, help="std-dev of per-camera height offsets"
+    )
+    parser.add_argument(
+        "--roll-jitter-deg",
+        type=float,
+        default=0.0,
+        help="std-dev of per-camera roll about the optical axis, degrees",
+    )
+    parser.add_argument(
+        "--tilt-deg", type=float, default=0.0, help="rotate the whole scene by this angle"
+    )
+    parser.add_argument(
+        "--tilt-axis",
+        type=float,
+        nargs=3,
+        default=(1.0, 0.0, 0.0),
+        metavar=("X", "Y", "Z"),
+        help="axis of the tilt (default 1 0 0)",
+    )
+    parser.add_argument(
+        "--offset",
+        type=float,
+        nargs=3,
+        default=(0.0, 0.0, 0.0),
+        metavar=("X", "Y", "Z"),
+        help="translate the whole scene after the tilt",
+    )
+    parser.add_argument(
+        "--non-planar",
+        type=float,
+        default=0.0,
+        help="amplitude of the vertical wave height += A * sin(2 * phi)",
+    )
+    parser.add_argument(
         "--names-from",
         type=Path,
         default=None,
@@ -459,6 +585,13 @@ def main(argv: list[str] | None = None) -> int:
         radius=args.radius,
         height=args.height,
         image_names=image_names,
+        arc_deg=args.arc_deg,
+        height_jitter=args.height_jitter,
+        roll_jitter_deg=args.roll_jitter_deg,
+        tilt_deg=args.tilt_deg,
+        tilt_axis=tuple(args.tilt_axis),
+        offset=tuple(args.offset),
+        non_planar=args.non_planar,
     )
     info = make_scene(args.out, params)
     print(f"written: {info['sparse_dir']}")

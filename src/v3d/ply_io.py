@@ -28,6 +28,7 @@ def write_ply(
     *,
     run_id: str,
     comments: list[str] | None = None,
+    axes: str = "opencv right-handed; units unknown",
 ) -> int:
     """Write a coloured point cloud. Returns the number of points written.
 
@@ -47,7 +48,7 @@ def write_ply(
         f"comment run_id: {run_id}",
         f"comment {HEADER_ARTIFACT_TYPE}",
         "comment scale_status: not_determined",
-        "comment axes: opencv right-handed; units unknown",
+        f"comment axes: {axes}",
     ]
     for text in comments or []:
         lines.append(f"comment {text}")

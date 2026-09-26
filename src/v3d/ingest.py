@@ -11,10 +11,12 @@ exit code — silently passing off an unusable result as successful is forbidden
 from __future__ import annotations
 
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
-from v3d import colmap_io, diagnostics, geometry, ingest_checks, ply_io, runs, status
+import numpy as np
+
+from v3d import colmap_io, diagnostics, geometry, ingest_checks, ply_io, runs, status, warnings_
 from v3d.artifacts import (
     RunStatus,
     default_conventions,
@@ -75,6 +77,54 @@ def _write_failed(
     write_json(layout.normalized / "status.json", payload)
 
 
+def _align(model: colmap_io.SparseModel) -> tuple[dict, list, np.ndarray]:
+    """Estimate the world alignment and express cameras and points in the aligned frame.
+
+    The raw reconstructor output in ``result/sparse`` is never modified; the transform is
+    recorded so the original frame stays recoverable (FR-046).
+    """
+    centres = [c.camera_center_world for c in model.cameras]
+    rotations = [c.R_world_to_camera for c in model.cameras]
+    alignment = geometry.estimate_alignment(
+        centres,
+        rotations,
+        points=model.points_xyz,
+        max_planarity=DEFAULTS.align_max_planarity,
+        min_arc_deg=DEFAULTS.align_min_arc_deg,
+        min_sign_agreement=DEFAULTS.align_min_sign_agreement,
+        min_cameras=DEFAULTS.align_min_cameras,
+    )
+    transform = alignment["transform"]
+    cameras = []
+    for cam in model.cameras:
+        R_new, t_new = geometry.apply_transform_to_pose(
+            transform, cam.R_world_to_camera, cam.t_world_to_camera
+        )
+        centre = geometry.camera_center_from_world_to_camera(R_new, t_new)
+        cameras.append(
+            replace(
+                cam,
+                R_world_to_camera=R_new.tolist(),
+                t_world_to_camera=t_new.tolist(),
+                camera_center_world=centre.tolist(),
+            )
+        )
+    points = geometry.apply_transform_to_points(transform, model.points_xyz)
+    return alignment, cameras, points
+
+
+def _world_axes(alignment: dict) -> str:
+    if alignment["status"] == "estimated":
+        return "right-handed, +Y up (estimated from camera trajectory), origin at object centre"
+    return "right-handed, origin at object centre; vertical not estimated"
+
+
+def _ply_axes(alignment: dict) -> str:
+    if alignment["status"] == "estimated":
+        return "right-handed +Y up (estimated); units unknown"
+    return "right-handed, vertical not estimated; units unknown"
+
+
 def run_ingest(
     run_dir: Path,
     *,
@@ -112,18 +162,24 @@ def run_ingest(
             )
             raise
 
+        alignment, aligned_cameras, aligned_xyz = _align(model)
+
+        # The outlier filter works per axis, so it runs in the aligned frame where the axes mean
+        # something (up, front, side).
         kept_xyz, kept_rgb, filter_info = geometry.filter_outliers_iqr(
-            model.points_xyz, model.points_rgb, k=outlier_k
+            aligned_xyz, model.points_rgb, k=outlier_k
         )
 
         conventions = default_conventions()
+        conventions["world_axes"] = _world_axes(alignment)
         write_json(
             layout.normalized / "cameras.json",
             {
                 "schema_version": "1",
                 "run_id": run_id,
                 "conventions": conventions,
-                "cameras": [c.to_dict() for c in model.cameras],
+                "world_alignment": alignment,
+                "cameras": [c.to_dict() for c in aligned_cameras],
             },
         )
         ply_io.write_ply(
@@ -133,9 +189,11 @@ def run_ingest(
             run_id=run_id,
             comments=[
                 "background_present: true",
-                f"cameras: {len(model.cameras)}",
-                "source: reconstructor output, outliers filtered",
+                f"cameras: {len(aligned_cameras)}",
+                f"world_alignment: {alignment['status']}",
+                "source: reconstructor output, aligned, outliers filtered",
             ],
+            axes=_ply_axes(alignment),
         )
 
     artifact_sizes = _artifact_sizes(layout)
@@ -156,9 +214,15 @@ def run_ingest(
         selected_frames=len(selected_ids),
         result_complete=True,
     )
+    alignment_warnings = []
+    if alignment["status"] != "estimated":
+        alignment_warnings.append(
+            warnings_.orientation_not_estimated(alignment["reason"] or "no reason").to_dict()
+        )
     status_payload = status.build_status(
         run_id,
         run_status,
+        warnings=alignment_warnings,
         precomputed_example=precomputed_example,
         cameras_registered=len(model.cameras),
         selected_frames=len(selected_ids),

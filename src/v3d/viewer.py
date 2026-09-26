@@ -126,7 +126,9 @@ def build_recording(
 
     panels = {
         "status": _status_panel(banner, usable=usable),
-        "info": _info_panel(manifest, diagnostics),
+        "info": _info_panel(manifest, diagnostics)
+        + "\n"
+        + "\n".join(_alignment_lines(cameras_file)),
         "warnings": _warnings_panel(status_file),
         "metrics": _metrics_panel(diagnostics),
     }
@@ -147,6 +149,7 @@ def build_recording(
         cameras=camera_records,
         conventions=cameras_file.get("conventions") or {},
         panels=panels,
+        y_up=_is_aligned(cameras_file),
     )
     stream.flush()
 
@@ -192,15 +195,18 @@ def _log_all(
     cameras: list[dict],
     conventions: dict,
     panels: dict[str, str],
+    y_up: bool = False,
 ) -> None:
     """Lay out the artifacts that were read into recording entities.
 
     Everything is logged as `static`: the view has no time axis, every entity is visible
     at any cursor position, including the permanent status line (FR-028).
     """
-    # World axes are declared explicitly: the camera convention is opencv
-    # (+X right, +Y down, +Z forward).
-    stream.log("/", rr.ViewCoordinates.RIGHT_HAND_Y_DOWN, static=True)
+    # World axes are declared explicitly. An aligned result (world_alignment.status = estimated)
+    # is right-handed with +Y up; otherwise the reconstructor frame keeps the OpenCV-style
+    # +Y down. Camera axes stay OpenCV inside each camera (logged per camera as RDF).
+    world = rr.ViewCoordinates.RIGHT_HAND_Y_UP if y_up else rr.ViewCoordinates.RIGHT_HAND_Y_DOWN
+    stream.log("/", world, static=True)
 
     stream.log(
         cloud_path,
@@ -317,6 +323,26 @@ def _status_panel(banner: str, *, usable: bool) -> str:
     if usable:
         return banner
     return f"{banner} · {UNUSABLE_MARK}"
+
+
+def _is_aligned(cameras_file: dict) -> bool:
+    """True when the result was brought to the estimated +Y-up frame (FR-045)."""
+    return (cameras_file.get("world_alignment") or {}).get("status") == "estimated"
+
+
+def _alignment_lines(cameras_file: dict) -> list[str]:
+    """How the shown frame was obtained; an estimate is never presented as a measurement."""
+    alignment = cameras_file.get("world_alignment")
+    if not alignment:
+        return ["## orientation", "", "reconstructor frame, no alignment recorded", ""]
+    quality = alignment.get("quality") or {}
+    lines = ["## orientation", "", f"status: {alignment.get('status')}"]
+    for key in ("planarity", "arc_coverage_deg", "sign_agreement", "num_cameras"):
+        value = quality.get(key)
+        shown = f"{value:.3f}" if isinstance(value, float) else str(value)
+        lines.append(f"{key}: {shown}")
+    lines += ["", str(alignment.get("note") or ""), ""]
+    return lines
 
 
 def _info_panel(manifest: dict, diagnostics: dict) -> str:

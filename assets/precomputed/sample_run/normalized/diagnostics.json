@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "run_id": "20260926-205546-6dd4e635",
+  "run_id": "20260926-211709-07dadd2e",
   "frames": {
     "frames_total": 40,
     "frames_selected": 12,
@@ -25,13 +25,13 @@
     "bbox": {
       "value": [
         [
-          -0.5,
-          -0.5,
+          -0.49999999999999994,
+          -0.4999999999999999,
           -0.5
         ],
         [
-          0.5,
-          0.5,
+          0.5000000000000002,
+          0.5000000000000003,
           0.5
         ]
       ],
@@ -49,29 +49,29 @@
         "bounds_per_axis": [
           {
             "axis": 0,
-            "lower": -2.80935887230354,
-            "upper": 2.723543052375393
+            "lower": -2.4250858585246737,
+            "upper": 2.4192938819125
           },
           {
             "axis": 1,
-            "lower": -2.4250858585246733,
-            "upper": 2.419293881912499
+            "lower": -2.7029716952302616,
+            "upper": 2.754407709503935
           },
           {
             "axis": 2,
-            "lower": -2.7029716952302607,
-            "upper": 2.7544077095039343
+            "lower": -2.80935887230354,
+            "upper": 2.723543052375393
           }
         ]
       }
     ]
   },
   "stage_durations_s": {
-    "ingest": 0.089
+    "ingest": 0.042
   },
   "artifact_sizes_bytes": {
-    "normalized/points.ply": 4948,
-    "normalized/cameras.json": 10773,
+    "normalized/points.ply": 5003,
+    "normalized/cameras.json": 12760,
     "result/sparse": 131636
   },
   "reprojection_error": {

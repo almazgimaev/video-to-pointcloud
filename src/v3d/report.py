@@ -258,12 +258,36 @@ def _conventions_lines(cameras_payload: dict | None, diag: dict | None) -> list[
     reference = conventions.get("scale_reference")
     lines.append(f"- **Scale reference**: {reference if reference else 'not used'}")
 
+    lines += _alignment_report_lines((cameras_payload or {}).get("world_alignment"))
+
     background = ((diag or {}).get("points") or {}).get("background_present")
     if background is None:
         lines.append(f"- **Residual background**: {BACKGROUND_NOTE}")
     else:
         mark = "present" if background else "marked as absent in the artifact"
         lines.append(f"- **Residual background**: {mark}. {BACKGROUND_NOTE}")
+    return lines
+
+
+def _alignment_report_lines(alignment: dict | None) -> list[str]:
+    """How the frame of the result was chosen (FR-045…FR-048)."""
+    if not alignment:
+        return ["- **Orientation**: reconstructor frame; no alignment recorded"]
+    quality = alignment.get("quality") or {}
+
+    def fmt(key: str) -> str:
+        value = quality.get(key)
+        return f"{value:.3f}" if isinstance(value, float) else str(value)
+
+    lines = [
+        f"- **Orientation**: {alignment.get('status')} — {alignment.get('note')}",
+        f"  - method: {alignment.get('method')}; centre: {alignment.get('centre_method')}; "
+        f"rotation about the vertical: {alignment.get('yaw_rule') or 'not applied'}",
+        f"  - quality: planarity {fmt('planarity')}, arc coverage {fmt('arc_coverage_deg')}°, "
+        f"sign agreement {fmt('sign_agreement')}, cameras {fmt('num_cameras')}",
+    ]
+    if alignment.get("reason"):
+        lines.append(f"  - reason: {alignment['reason']}")
     return lines
 
 

@@ -188,15 +188,15 @@ every push.
 
 **Independent Test**: synthetic tilted scene → vertical recovered within tolerance; partial arc → `not_estimated`; re-ingested pumpkin run stands upright and rotates in place in `v3d view`; export still equals the shown cloud.
 
-- [ ] T068 [P] [US3] Extend `assets/synthetic/make_scene.py` with scene tilt, camera height jitter, per-camera roll and partial-arc options, recording the true vertical in `expected.json`
-- [ ] T069 [US3] Implement in `src/v3d/geometry.py`: plane fit to camera centres, sign from mean camera up vector, quality metrics (planarity, arc coverage, sign agreement, number of cameras), optical-axes nearest point, and the rigid alignment transform with the `first_camera_in_front` yaw rule; apply a rigid transform to poses and points
-- [ ] T070 [P] [US3] Tests in `tests/unit/test_alignment.py`: tilt recovered within tolerance under height jitter and roll (SC-015); partial arc and non-planar path rejected (SC-016); transform is rigid and invertible; sign correct; centre robust to background points
-- [ ] T071 [US3] Add preliminary gate thresholds to `src/v3d/config.py` and warning code `orientation_not_estimated` to `src/v3d/errors.py` / `src/v3d/warnings_.py`
-- [ ] T072 [US3] Apply alignment in `src/v3d/ingest.py` before writing `normalized/`; write the `world_alignment` block and updated `conventions` into `cameras.json` (data-model §3.4a); keep `result/sparse/` untouched
-- [ ] T073 [US3] Switch `src/v3d/viewer.py` to a Y-up world when `world_alignment.status = estimated`; show the alignment note in the info panel; show alignment in `src/v3d/report.py`
-- [ ] T074 [US3] Add `v3d visual-check <run> <item> ok|defect|not_checked [--note]` in `src/v3d/cli.py` writing `checked_at` into `diagnostics.json` (FR-049, SC-018), with tests
-- [ ] T075 [US3] Integration test `tests/integration/test_ingest_alignment.py`: aligned ingest of a tilted synthetic scene; export equals shown cloud after alignment (SC-017)
-- [ ] T076 [US3] Re-ingest the local pumpkin runs and regenerate `assets/precomputed/sample_run`; confirm upright orientation visually and record the result with `v3d visual-check`
+- [X] T068 [P] [US3] Extend `assets/synthetic/make_scene.py` with scene tilt, camera height jitter, per-camera roll and partial-arc options, recording the true vertical in `expected.json`
+- [X] T069 [US3] Implement in `src/v3d/geometry.py`: plane fit to camera centres, sign from mean camera up vector, quality metrics (planarity, arc coverage, sign agreement, number of cameras), optical-axes nearest point, and the rigid alignment transform with the `first_camera_in_front` yaw rule; apply a rigid transform to poses and points
+- [X] T070 [P] [US3] Tests in `tests/unit/test_alignment.py`: tilt recovered within tolerance under height jitter and roll (SC-015); partial arc and non-planar path rejected (SC-016); transform is rigid and invertible; sign correct; centre robust to background points
+- [X] T071 [US3] Add preliminary gate thresholds to `src/v3d/config.py` and warning code `orientation_not_estimated` to `src/v3d/errors.py` / `src/v3d/warnings_.py`
+- [X] T072 [US3] Apply alignment in `src/v3d/ingest.py` before writing `normalized/`; write the `world_alignment` block and updated `conventions` into `cameras.json` (data-model §3.4a); keep `result/sparse/` untouched
+- [X] T073 [US3] Switch `src/v3d/viewer.py` to a Y-up world when `world_alignment.status = estimated`; show the alignment note in the info panel; show alignment in `src/v3d/report.py`
+- [X] T074 [US3] Add `v3d visual-check <run> <item> ok|defect|not_checked [--note]` in `src/v3d/cli.py` writing `checked_at` into `diagnostics.json` (FR-049, SC-018), with tests
+- [X] T075 [US3] Integration test `tests/integration/test_ingest_alignment.py`: aligned ingest of a tilted synthetic scene; export equals shown cloud after alignment (SC-017)
+- [X] T076 [US3] Re-ingest the local pumpkin runs and regenerate `assets/precomputed/sample_run`; confirm upright orientation visually and record the result with `v3d visual-check`
 
 **Checkpoint**: aligned results everywhere; visual check is recordable.
 

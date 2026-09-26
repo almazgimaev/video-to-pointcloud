@@ -100,6 +100,7 @@ WARNING_CODES = frozenset(
         "background_dominates",
         "reprojection_error_unavailable",
         "precomputed_example",
+        "orientation_not_estimated",
     }
 )
 

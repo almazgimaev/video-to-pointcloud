@@ -235,6 +235,45 @@ def cmd_report(args: argparse.Namespace) -> int:
     return ExitCode.OK
 
 
+def cmd_visual_check(args: argparse.Namespace) -> int:
+    """Record or list the author's visual check of a run (FR-049)."""
+    from pathlib import Path
+
+    from v3d.artifacts import VISUAL_CHECK_ITEMS
+    from v3d.errors import InputUnusableError
+    from v3d.visual_check import read_visual_check, record_visual_check
+
+    as_json = getattr(args, "json", False)
+    if getattr(args, "list", False):
+        checks = read_visual_check(Path(args.run_dir))
+        if as_json:
+            print(json.dumps(checks, ensure_ascii=False, indent=2))
+            return ExitCode.OK
+        for name, entry in checks.items():
+            line = f"visual check: {name} = {entry['result']}"
+            if entry["checked_at"]:
+                line += f" at {entry['checked_at']}"
+            if entry["note"]:
+                line += f" (note: {entry['note']})"
+            say(args, line)
+        return ExitCode.OK
+
+    if not args.item or not args.result:
+        raise InputUnusableError(
+            "item and result are required unless --list is given",
+            details="valid items: " + ", ".join(VISUAL_CHECK_ITEMS),
+        )
+    entry = record_visual_check(Path(args.run_dir), args.item, args.result, note=args.note)
+    if as_json:
+        print(json.dumps({"item": args.item, **entry}, ensure_ascii=False, indent=2))
+        return ExitCode.OK
+    line = f"visual check: {args.item} = {entry['result']}"
+    if entry["note"]:
+        line += f" (note: {entry['note']})"
+    say(args, line)
+    return ExitCode.OK
+
+
 def cmd_compare(args: argparse.Namespace) -> int:
     """Compare two runs of experiment P2 under pre-fixed conditions."""
     raise NotImplementedError("the comparison stage is not implemented yet (task T051)")
@@ -368,6 +407,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--out", default=None, help="report file; without the flag — <run_dir>/report.md"
     )
     p_report.set_defaults(func=cmd_report)
+
+    p_visual = subparsers.add_parser(
+        "visual-check",
+        parents=[common],
+        help="record or list the author's visual check of a run",
+        description="Records a human judgement per defect item into normalized/diagnostics.json.",
+    )
+    p_visual.add_argument("run_dir", help="run directory runs/<run_id>")
+    p_visual.add_argument("item", nargs="?", default=None, help="defect item to record")
+    p_visual.add_argument("result", nargs="?", default=None, help="one of: ok, defect, not_checked")
+    p_visual.add_argument("--note", default=None, help="free-text note stored with the result")
+    p_visual.add_argument(
+        "--list", action="store_true", help="print all items with result, note and time"
+    )
+    p_visual.set_defaults(func=cmd_visual_check)
 
     p_compare = subparsers.add_parser(
         "compare",

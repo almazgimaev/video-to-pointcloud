@@ -114,18 +114,26 @@ def test_normalized_result_declares_conventions(run_dir: Path, tmp_path: Path) -
 
 
 def test_camera_poses_match_the_scene_reference(run_dir: Path, tmp_path: Path) -> None:
-    """Main convention check: camera centres agree with what was put into the scene."""
+    """Main convention check: undoing the recorded alignment gives back the scene's cameras.
+
+    Normalized poses are in the aligned frame; the inverse of the recorded transform must
+    recover the reconstructor frame exactly (FR-046), which here is the scene reference.
+    """
+    from v3d.geometry import apply_transform_to_points, invert_transform
+
     scene = _make_scene(tmp_path / "scene", frames_json=run_dir / "frames.json")
     run_ingest(run_dir, source=scene)
 
     expected = json.loads((scene / "expected.json").read_text(encoding="utf-8"))
     cameras = json.loads((run_dir / "normalized" / "cameras.json").read_text(encoding="utf-8"))
+    undo = invert_transform(cameras["world_alignment"]["transform"])
     by_frame = {c["frame_id"]: c for c in cameras["cameras"]}
 
     for image in expected["images"]:
         frame_id = Path(image["name"]).stem
-        actual = np.array(by_frame[frame_id]["camera_center_world"])
-        assert np.allclose(actual, np.array(image["center"]), atol=1e-9), (
+        aligned = np.array(by_frame[frame_id]["camera_center_world"])
+        original = apply_transform_to_points(undo, aligned)[0]
+        assert np.allclose(original, np.array(image["center"]), atol=1e-9), (
             f"camera centre {frame_id} diverged from the scene reference"
         )
 
